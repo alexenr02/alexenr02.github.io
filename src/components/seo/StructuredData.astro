@@ -1,0 +1,46 @@
+---
+// JSON-LD structured data for SEO
+// Provides schema.org structured data for better search engine understanding
+
+import { SITE, SOCIAL_LINKS } from '@lib/constants';
+
+// Person schema for portfolio owner
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: SITE.name,
+  url: SITE.url,
+  jobTitle: 'Embedded Software Engineer',
+  description: SITE.description,
+  email: SITE.email,
+  sameAs: [SOCIAL_LINKS.github, SOCIAL_LINKS.linkedin],
+  knowsAbout: [
+    'Embedded Systems',
+    'C++',
+    'RTOS',
+    'CAN Bus',
+    'J1939',
+    'Industrial Automation',
+    'Automotive Systems',
+  ],
+};
+
+// WebSite schema
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: SITE.title,
+  url: SITE.url,
+  author: {
+    '@type': 'Person',
+    name: SITE.name,
+  },
+  description: SITE.description,
+};
+---
+
+<!-- Person Schema -->
+<script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+
+<!-- Website Schema -->
+<script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />

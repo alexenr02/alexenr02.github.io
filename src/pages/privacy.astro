@@ -1,0 +1,138 @@
+---
+// Privacy Policy Page
+// Comprehensive privacy policy documenting all data collection
+
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { SITE } from '@lib/constants';
+---
+
+<BaseLayout title="Privacy Policy" description="Privacy policy and data handling information">
+  <div class="container mx-auto max-w-4xl px-4 py-12">
+    <h1 class="mb-4 text-4xl font-bold text-foreground">Privacy Policy</h1>
+    <p class="mb-8 text-sm text-secondary">
+      Last updated: {
+        new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+      }
+    </p>
+
+    <div class="prose prose-gray max-w-none dark:prose-invert">
+      <section class="mb-8">
+        <h2 class="mb-4 text-2xl font-semibold text-foreground">Introduction</h2>
+        <p class="text-secondary">
+          This privacy policy explains how this website collects, uses, and protects your personal
+          information. I am committed to transparency and protecting your privacy.
+        </p>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="mb-4 text-2xl font-semibold text-foreground">Data Collection</h2>
+        <p class="mb-4 text-secondary">This website collects minimal data to function properly:</p>
+
+        <h3 class="mb-2 text-xl font-semibold text-foreground">Analytics</h3>
+        <ul class="mb-4 list-disc space-y-2 pl-6 text-secondary">
+          <li>
+            <strong>Netlify Analytics:</strong> Server-side analytics that tracks pageviews and bandwidth.
+            No cookies are set, no personal data is collected. GDPR-compliant.
+          </li>
+        </ul>
+
+        <h3 class="mb-2 text-xl font-semibold text-foreground">Contact Form</h3>
+        <ul class="mb-4 list-disc space-y-2 pl-6 text-secondary">
+          <li>
+            When you submit the contact form, your name, email, and message are sent to {SITE.email}
+          </li>
+          <li>Data is processed by Netlify Forms (100 submissions/month free tier)</li>
+          <li>Submissions are stored in Netlify's dashboard for review</li>
+        </ul>
+
+        <h3 class="mb-2 text-xl font-semibold text-foreground">Spam Protection</h3>
+        <ul class="mb-4 list-disc space-y-2 pl-6 text-secondary">
+          <li>
+            <strong>Cloudflare Turnstile:</strong> Used to prevent spam on the contact form. May set cookies
+            for CAPTCHA verification.
+          </li>
+        </ul>
+
+        <h3 class="mb-2 text-xl font-semibold text-foreground">Error Tracking</h3>
+        <ul class="mb-4 list-disc space-y-2 pl-6 text-secondary">
+          <li>
+            <strong>Sentry:</strong> Tracks runtime errors to improve site stability. Collects browser
+            info, error stack traces, and anonymized user interactions.
+          </li>
+        </ul>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="mb-4 text-2xl font-semibold text-foreground">Cookies</h2>
+        <ul class="list-disc space-y-2 pl-6 text-secondary">
+          <li>
+            <strong>Theme Preference:</strong> localStorage (not a cookie) stores your dark/light mode
+            preference
+          </li>
+          <li>
+            <strong>Cloudflare Turnstile:</strong> May set cookies for CAPTCHA verification
+          </li>
+        </ul>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="mb-4 text-2xl font-semibold text-foreground">Your Rights</h2>
+        <p class="mb-4 text-secondary">You have the right to:</p>
+        <ul class="list-disc space-y-2 pl-6 text-secondary">
+          <li>Request deletion of any data submitted via contact form</li>
+          <li>Opt out of analytics (use browser extensions or disable JavaScript)</li>
+          <li>Clear your browser's localStorage to reset theme preference</li>
+        </ul>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="mb-4 text-2xl font-semibold text-foreground">Third-Party Services</h2>
+        <p class="mb-4 text-secondary">This website uses the following third-party services:</p>
+        <ul class="list-disc space-y-2 pl-6 text-secondary">
+          <li>
+            <strong>Netlify:</strong> Hosting, forms, and analytics - <a
+              href="https://www.netlify.com/privacy/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-primary hover:underline">Privacy Policy</a
+            >
+          </li>
+          <li>
+            <strong>Cloudflare:</strong> Turnstile spam protection - <a
+              href="https://www.cloudflare.com/privacypolicy/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-primary hover:underline">Privacy Policy</a
+            >
+          </li>
+          <li>
+            <strong>Sentry:</strong> Error tracking - <a
+              href="https://sentry.io/privacy/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-primary hover:underline">Privacy Policy</a
+            >
+          </li>
+        </ul>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="mb-4 text-2xl font-semibold text-foreground">Changes to This Policy</h2>
+        <p class="text-secondary">
+          This privacy policy may be updated from time to time. The "Last updated" date at the top
+          of this page will reflect any changes.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="mb-4 text-2xl font-semibold text-foreground">Contact</h2>
+        <p class="text-secondary">
+          For privacy-related questions or concerns, please email: <a
+            href={`mailto:${SITE.email}`}
+            class="text-primary hover:underline">{SITE.email}</a
+          >
+        </p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>

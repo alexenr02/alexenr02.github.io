@@ -1,0 +1,103 @@
+---
+// About section component
+// Displays professional information, photo, and resume download
+
+import { SITE } from '@lib/constants';
+import { Download } from 'lucide-svelte';
+---
+
+<section id="about" class="scroll-mt-20 py-section">
+  <div class="container mx-auto px-4">
+    <h2 class="mb-12 text-3xl font-bold text-foreground md:text-4xl">About Me</h2>
+
+    <div class="grid gap-12 md:grid-cols-2 md:gap-16">
+      <!-- Photo Column -->
+      <div class="flex flex-col items-center md:items-start">
+        <div class="relative mb-6 h-64 w-64 overflow-hidden rounded-lg border-2 border-border bg-card shadow-lg md:h-80 md:w-80">
+          <!-- Placeholder for professional photo -->
+          <div
+            class="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5 text-4xl font-bold text-primary"
+          >
+            AE
+          </div>
+          <!-- TODO: Replace with actual photo -->
+          <!-- <img src="/images/avatar/profile.jpg" alt="Alejandro Enriquez" class="h-full w-full object-cover" /> -->
+        </div>
+
+        <!-- Resume Download Button -->
+        <a
+          href="/resume/Alex-E-Technical-Oct-2025.pdf"
+          download
+          class="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-white transition-colors hover:bg-primary/90"
+        >
+          <Download class="h-5 w-5" aria-hidden="true" />
+          Download Resume
+        </a>
+      </div>
+
+      <!-- Content Column -->
+      <div class="space-y-6">
+        <div>
+          <h3 class="mb-4 text-2xl font-semibold text-foreground">
+            Firmware & Embedded Engineer
+          </h3>
+          <p class="mb-4 text-lg leading-relaxed text-secondary">
+            Embedded Software Engineer specialized in C/C++ firmware development, RTOS integration
+            (embOS, MQX), and CAN/J1939 diagnostics for automotive and industrial systems.
+          </p>
+          <p class="mb-4 text-lg leading-relaxed text-secondary">
+            Hands-on experience with IAR, MPLAB X, IBM Jazz RTD, and hardware debugging using
+            BUSMASTER, Kvaser, Peak, and J-Link. Strong technical communicator and mentor, having
+            designed onboarding and documentation processes for new team members.
+          </p>
+        </div>
+
+        <!-- Key Achievements -->
+        <div>
+          <h4 class="mb-3 text-xl font-semibold text-foreground">Key Achievements</h4>
+          <ul class="space-y-2 text-secondary">
+            <li class="flex items-start gap-2">
+              <span class="mt-1 text-primary">•</span>
+              <span>
+                Implemented a Thread Watchdog for legacy MCU diagnostics, improving system
+                stability
+              </span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="mt-1 text-primary">•</span>
+              <span>
+                Developed Python-based build automation script, reducing compile time from 20 min
+                to 3 min
+              </span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="mt-1 text-primary">•</span>
+              <span>
+                Designed onboarding process for new engineers at Monterrey Technologic Hub
+              </span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="mt-1 text-primary">•</span>
+              <span>
+                Optimized firmware flashing procedure using PowerShell, reducing process time by
+                30%
+              </span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Education -->
+        <div>
+          <h4 class="mb-3 text-xl font-semibold text-foreground">Education</h4>
+          <div class="text-secondary">
+            <p class="font-semibold text-foreground">
+              Tecnológico de Monterrey (ITESM) | Nuevo León, México
+            </p>
+            <p class="mt-1">B.S. in Digital Systems and Robotics Engineering</p>
+            <p class="mt-1 text-sm">GPA: 91/100 | Full Scholarship "Líderes del Mañana"</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

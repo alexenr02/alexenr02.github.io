@@ -1,0 +1,53 @@
+# Netlify Configuration
+# See: https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    # Content Security Policy
+    # Note: 'unsafe-inline' is used initially for Astro's inline scripts
+    # TODO: Implement nonce strategy for stricter CSP in production
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://js.sentry-cdn.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://challenges.cloudflare.com https://sentry.io; frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; form-action 'self'"
+
+# Cache static assets - fonts
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache static assets - images
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# 404 redirect - serve custom 404 page
+[[redirects]]
+  from = "/*"
+  to = "/404"
+  status = 404
+
+# 301 redirects for removed/renamed projects
+# Uncomment and modify as needed when renaming or removing projects
+# [[redirects]]
+#   from = "/projects/old-slug"
+#   to = "/projects/new-slug"
+#   status = 301
+
+# Form notifications - Netlify Forms
+# Email notifications sent to this address
+[form.settings]
+  recipients = ["aelejandro9@proton.me"]

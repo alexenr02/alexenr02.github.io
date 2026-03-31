@@ -1,0 +1,80 @@
+---
+// Base layout for all pages
+// Provides semantic HTML structure, no-flash theme script, and common elements
+
+import { ViewTransitions } from 'astro:transitions';
+import MetaTags from '@components/seo/MetaTags.astro';
+import StructuredData from '@components/seo/StructuredData.astro';
+import Navbar from '@components/common/Navbar.astro';
+import Footer from '@components/common/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  canonical?: string;
+  noindex?: boolean;
+}
+
+const { title, description, ogImage, canonical, noindex } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- No-flash theme script - runs before page render -->
+    <script is:inline>
+      (function () {
+        // Get theme from localStorage or system preference
+        const stored = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = stored || (prefersDark ? 'dark' : 'light');
+
+        // Apply theme immediately to prevent flash
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <MetaTags
+      title={title}
+      description={description}
+      ogImage={ogImage}
+      canonical={canonical}
+      noindex={noindex}
+    />
+
+    <!-- Structured Data -->
+    <StructuredData />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Preload Critical Fonts -->
+    <link rel="preload" href="/fonts/GeistVF.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/GeistMonoVF.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!-- View Transitions API for smooth page navigation -->
+    <ViewTransitions />
+  </head>
+
+  <body class="flex min-h-screen flex-col">
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="skip-link"> Skip to main content</a>
+
+    <!-- Navigation -->
+    <Navbar />
+
+    <!-- Main Content -->
+    <main id="main-content" class="flex-1 pt-20">
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <Footer />
+
+    <!-- Sentry Error Tracking (Phase 8) -->
+    <!-- Will be added in Phase 8 with proper configuration -->
+  </body>
+</html>

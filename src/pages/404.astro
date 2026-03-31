@@ -1,0 +1,32 @@
+---
+// 404 Error Page
+// Custom page for not found errors
+
+import BaseLayout from '@layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page Not Found" description="The page you're looking for doesn't exist." noindex>
+  <div class="flex min-h-[calc(100vh-5rem)] items-center justify-center px-4">
+    <div class="container mx-auto text-center">
+      <h1 class="mb-4 text-6xl font-bold text-foreground md:text-8xl">404</h1>
+      <h2 class="mb-4 text-2xl font-semibold text-foreground md:text-3xl">Page Not Found</h2>
+      <p class="mb-8 text-lg text-secondary">
+        The page you're looking for doesn't exist or has been moved.
+      </p>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a
+          href="/"
+          class="hover:bg-primary/90 rounded-lg bg-primary px-6 py-3 font-medium text-white transition-colors"
+        >
+          Back to Home
+        </a>
+        <a
+          href="/#contact"
+          class="rounded-lg border border-border px-6 py-3 font-medium text-foreground transition-colors hover:bg-card"
+        >
+          Contact Me
+        </a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

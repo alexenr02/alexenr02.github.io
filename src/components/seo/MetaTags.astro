@@ -1,0 +1,61 @@
+---
+// SEO meta tags component
+// Provides Open Graph, Twitter Card, and standard meta tags
+
+import { SITE } from '@lib/constants';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  canonical?: string;
+  noindex?: boolean;
+}
+
+const {
+  title = SITE.title,
+  description = SITE.description,
+  ogImage,
+  canonical,
+  noindex = false,
+} = Astro.props;
+
+// Construct full URLs
+const canonicalURL = canonical || new URL(Astro.url.pathname, Astro.site).href;
+const ogImageURL = ogImage
+  ? new URL(ogImage, Astro.site).href
+  : new URL('/images/og/default.png', Astro.site).href;
+
+// Full title with site name
+const fullTitle = title === SITE.title ? title : `${title} | ${SITE.name}`;
+---
+
+<!-- Primary Meta Tags -->
+<title>{fullTitle}</title>
+<meta name="title" content={fullTitle} />
+<meta name="description" content={description} />
+<meta name="author" content={SITE.author} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+<!-- Canonical URL -->
+<link rel="canonical" href={canonicalURL} />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={ogImageURL} />
+<meta property="og:site_name" content={SITE.name} />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content={canonicalURL} />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImageURL} />
+
+<!-- Additional Meta Tags -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="generator" content={Astro.generator} />
+<meta charset="utf-8" />
