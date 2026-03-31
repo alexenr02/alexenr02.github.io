@@ -2,8 +2,7 @@
 
 **Modern portfolio website for embedded systems and software engineer**
 
-[![CI Pipeline](https://github.com/yourusername/portfolio/workflows/CI%20Pipeline/badge.svg)](https://github.com/yourusername/portfolio/actions)
-[![Netlify Status](https://api.netlify.com/api/v1/badges/your-badge-id/deploy-status)](https://app.netlify.com/sites/your-site/deploys)
+[![Deploy to GitHub Pages](https://github.com/alexenr02/alexenr02.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/alexenr02/alexenr02.github.io/actions/workflows/deploy.yml)
 
 ---
 
@@ -25,7 +24,7 @@ This is a high-performance, accessible portfolio website built with modern web t
 - Accessible (WCAG AA compliant)
 - Performance-optimized (Lighthouse 90+ target)
 - SEO-ready with structured data
-- Privacy-focused analytics
+- Privacy-focused (no analytics, no tracking)
 - Responsive and mobile-first design
 
 ---
@@ -54,10 +53,9 @@ This is a high-performance, accessible portfolio website built with modern web t
 
 ### Deployment & Services
 
-- **Netlify** - Hosting and deployment
-- **Netlify Analytics** - Privacy-friendly analytics
-- **Netlify Forms** - Contact form handling
-- **Cloudflare Turnstile** - Spam protection
+- **GitHub Pages** - Hosting and deployment
+- **GitHub Actions** - CI/CD pipeline
+- **Cloudflare Turnstile** - Spam protection (contact form)
 - **Sentry** - Error tracking
 
 ### Future Enhancements (Phase 4+)
@@ -97,7 +95,6 @@ portfolio/
 ├── astro.config.mjs         # Astro configuration
 ├── tailwind.config.mjs      # Tailwind configuration
 ├── tsconfig.json            # TypeScript config (strict mode)
-├── netlify.toml             # Netlify config + security headers
 ├── .eslintrc.cjs            # ESLint rules
 ├── .prettierrc              # Prettier config
 └── .browserslistrc          # Browser targets
@@ -118,8 +115,8 @@ portfolio/
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/yourusername/portfolio.git
-   cd portfolio
+   git clone https://github.com/alexenr02/alexenr02.github.io.git
+   cd alexenr02.github.io
    ```
 
 2. **Install dependencies:**
@@ -172,9 +169,8 @@ main (production)
 1. Create feature branch from `main`
 2. Develop and test locally
 3. Push branch and create pull request
-4. Netlify creates deploy preview automatically
-5. Review, test, and merge to `main`
-6. Netlify auto-deploys to production
+4. Review and merge to `main`
+5. GitHub Actions automatically builds and deploys to GitHub Pages
 
 ### Making Changes
 
@@ -242,7 +238,7 @@ SENTRY_ORG=your_org
 SENTRY_PROJECT=your_project
 
 # Site Configuration
-PUBLIC_SITE_URL=https://yourdomain.com
+PUBLIC_SITE_URL=https://alexenr02.github.io
 ```
 
 **Where to get API keys:**
@@ -295,8 +291,7 @@ Heavy features (Three.js, GSAP, interactive labs) are deferred to Phase 4+ with 
 
 ### Privacy & Security
 
-- **Server-side analytics** (Netlify Analytics) - no cookies, GDPR-compliant
-- **Security headers** configured in `netlify.toml`
+- **No analytics** - zero tracking, no cookies, fully GDPR-compliant
 - **Spam protection** with honeypot + Cloudflare Turnstile
 - **Privacy policy page** documenting all data collection
 - **No unnecessary tracking** or third-party scripts
@@ -367,32 +362,22 @@ This site aims for **WCAG AA compliance** with:
 
 ## Deployment
 
-### Netlify Configuration
+### GitHub Pages + GitHub Actions
 
-The site deploys automatically to Netlify:
+The site deploys automatically via GitHub Actions on every push to `main`:
 
-- **Production branch:** `main`
-- **Deploy previews:** All pull requests
+- **Live URL:** [alexenr02.github.io](https://alexenr02.github.io)
+- **Workflow:** `.github/workflows/deploy.yml`
 - **Build command:** `npm run build`
 - **Publish directory:** `dist`
 
-### Security Headers
-
-Security headers are configured in `netlify.toml`:
-
-- X-Frame-Options: DENY
-- X-Content-Type-Options: nosniff
-- Content Security Policy (CSP)
-- Referrer Policy
-- Permissions Policy
+The workflow installs dependencies, runs `npm run build`, and uploads the
+`dist/` output directly to GitHub Pages — no Jekyll involved.
 
 ### Contact Form
 
-Netlify Forms configured to send notifications to:
-
-- **Email:** aelejandro9@proton.me
-- **Monthly limit:** 100 submissions (free tier)
-- **Fallback:** `mailto:` link when limit reached
+Contact is handled via direct email (`mailto:`) link.
+A form with spam protection (Cloudflare Turnstile) will be added in Phase 2.
 
 ---
 
@@ -434,8 +419,8 @@ See [LICENSE](LICENSE) file for details.
 
 **Social Links:**
 
-- GitHub: [yourusername](https://github.com/yourusername)
-- LinkedIn: [yourprofile](https://linkedin.com/in/yourprofile)
+- GitHub: [alexenr02](https://github.com/alexenr02)
+- LinkedIn: [alexenr](https://linkedin.com/in/alexenr)
 
 ---
 
@@ -459,7 +444,6 @@ Dependencies are updated manually on a quarterly basis to avoid unnecessary chur
 
 ### Performance Monitoring
 
-- **Netlify Analytics:** Traffic and performance metrics
 - **Sentry:** Error tracking and performance monitoring
 - **Lighthouse CI:** Performance regression detection (Phase 10)
 

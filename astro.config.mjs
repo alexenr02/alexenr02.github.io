@@ -8,7 +8,6 @@ import compress from 'astro-compress';
 
 // https://astro.build/config
 export default defineConfig({
-  // Site URL - will be updated with actual Netlify domain after deployment
   site: 'https://alexenr02.github.io',
   output: 'static',
 

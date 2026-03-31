@@ -5,7 +5,7 @@ export const SITE = {
   title: 'Alejandro Enriquez - Embedded Software Engineer',
   description:
     'Embedded Software Engineer with experience across industrial, automotive, and refrigeration systems. Skilled in C++ development, RTOS (embOS, MQX), and CAN/J1939 communication.',
-  url: 'https://yourdomain.com', // Update with actual domain when available
+  url: 'https://alexenr02.github.io',
   author: 'Alejandro Enriquez',
   email: 'aelejandro9@proton.me',
 } as const;
