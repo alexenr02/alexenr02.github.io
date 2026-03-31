@@ -1,0 +1,86 @@
+---
+// Work Experience timeline section
+// Reads from src/content/experience/ and renders a vertical timeline
+
+import { getCollection } from 'astro:content';
+
+const entries = await getCollection('experience');
+const sorted = entries.sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99));
+
+// Format a date as "Month YYYY" or "Present"
+function formatDate(date?: Date): string {
+  if (!date) return 'Present';
+  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+}
+---
+
+<section id="experience" class="scroll-mt-20 py-section">
+  <div class="container mx-auto px-4">
+    <h2 class="mb-12 text-3xl font-bold text-foreground md:text-4xl">Work Experience</h2>
+
+    <div class="relative">
+      <!-- Vertical line -->
+      <div class="absolute left-0 top-0 hidden h-full w-px bg-border md:block md:left-[7.5rem]">
+      </div>
+
+      <div class="space-y-10">
+        {
+          sorted.map((entry) => (
+            <div class="relative md:flex md:gap-8">
+              <!-- Date range column -->
+              <div class="mb-2 shrink-0 md:mb-0 md:w-28 md:pt-1 md:text-right">
+                <span class="text-sm font-medium text-secondary">
+                  {formatDate(entry.data.startDate)}
+                </span>
+                <span class="mx-1 text-sm text-secondary">–</span>
+                <span class="text-sm font-medium text-secondary">
+                  {formatDate(entry.data.endDate)}
+                </span>
+              </div>
+
+              <!-- Timeline dot -->
+              <div class="absolute left-[-5px] top-2 hidden h-[10px] w-[10px] rounded-full border-2 border-primary bg-background md:block md:left-[7.1rem]" />
+
+              <!-- Content card -->
+              <div class="flex-1 rounded-lg border border-border bg-card p-6 transition-colors hover:border-primary/40">
+                <!-- Header -->
+                <div class="mb-3 flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <h3 class="text-lg font-semibold text-foreground">{entry.data.position}</h3>
+                    <p class="text-base font-medium text-primary">{entry.data.company}</p>
+                  </div>
+                  {entry.data.location && (
+                    <span class="shrink-0 text-sm text-secondary">{entry.data.location}</span>
+                  )}
+                </div>
+
+                <!-- Responsibilities -->
+                {entry.data.responsibilities && entry.data.responsibilities.length > 0 && (
+                  <ul class="mb-4 space-y-1.5">
+                    {entry.data.responsibilities.map((item) => (
+                      <li class="flex items-start gap-2 text-sm text-secondary">
+                        <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                <!-- Tech tags -->
+                {entry.data.technologies && entry.data.technologies.length > 0 && (
+                  <div class="flex flex-wrap gap-2">
+                    {entry.data.technologies.map((tech) => (
+                      <span class="rounded-md border border-border bg-background px-2.5 py-0.5 text-xs font-medium text-secondary">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>

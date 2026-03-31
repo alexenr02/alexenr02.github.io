@@ -4,6 +4,9 @@
 
 import BaseLayout from '@layouts/BaseLayout.astro';
 import About from '@components/sections/About.astro';
+import Skills from '@components/sections/Skills.astro';
+import WorkExperience from '@components/sections/WorkExperience.astro';
+import Contact from '@components/sections/Contact.astro';
 import { SITE } from '@lib/constants';
 ---
 
@@ -19,8 +22,7 @@ import { SITE } from '@lib/constants';
       </h1>
       <p class="mb-8 text-xl text-secondary md:text-2xl">Embedded Software Engineer</p>
       <p class="mx-auto mb-8 max-w-2xl text-lg text-secondary">
-        Experience across industrial, automotive, and refrigeration systems. Skilled in C++
-        development, RTOS (embOS, MQX), and CAN/J1939 communication.
+        {SITE.description}
       </p>
       <div class="flex flex-wrap justify-center gap-4">
         <a
@@ -42,6 +44,12 @@ import { SITE } from '@lib/constants';
   <!-- About Section -->
   <About />
 
+  <!-- Skills Section -->
+  <Skills />
+
+  <!-- Work Experience Section -->
+  <WorkExperience />
+
   <!-- Projects Section (Placeholder) -->
   <section id="projects" class="scroll-mt-20 bg-card py-section">
     <div class="container mx-auto px-4">
@@ -50,35 +58,14 @@ import { SITE } from '@lib/constants';
     </div>
   </section>
 
-  <!-- Work Experience Section (Placeholder) -->
-  <section id="experience" class="scroll-mt-20 py-section">
-    <div class="container mx-auto px-4">
-      <h2 class="mb-8 text-3xl font-bold text-foreground md:text-4xl">Work Experience</h2>
-      <p class="text-lg text-secondary">Work experience timeline will be added in Phase 2.</p>
-    </div>
-  </section>
-
   <!-- Lab/Experiments Section (Placeholder) -->
-  <section id="lab" class="scroll-mt-20 bg-card py-section">
+  <section id="lab" class="scroll-mt-20 py-section">
     <div class="container mx-auto px-4">
       <h2 class="mb-8 text-3xl font-bold text-foreground md:text-4xl">Lab & Experiments</h2>
       <p class="text-lg text-secondary">Interactive experiments will be added in Phase 4.</p>
     </div>
   </section>
 
-  <!-- Contact Section (Placeholder) -->
-  <section id="contact" class="scroll-mt-20 py-section">
-    <div class="container mx-auto px-4">
-      <h2 class="mb-8 text-3xl font-bold text-foreground md:text-4xl">Get in Touch</h2>
-      <p class="text-lg text-secondary">Contact form will be implemented in Phase 2.</p>
-      <div class="mt-8">
-        <a
-          href={`mailto:${SITE.email}`}
-          class="hover:bg-primary/90 inline-block rounded-lg bg-primary px-6 py-3 font-medium text-white transition-colors"
-        >
-          Email Me
-        </a>
-      </div>
-    </div>
-  </section>
+  <!-- Contact Section -->
+  <Contact />
 </BaseLayout>

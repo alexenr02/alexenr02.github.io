@@ -1,0 +1,52 @@
+---
+// Skills section
+// Grouped by category, derived from resume Technical Competencies
+
+const skillGroups = [
+  {
+    category: 'Languages',
+    skills: ['C++', 'C', 'Python', 'Java (basic)'],
+  },
+  {
+    category: 'RTOS',
+    skills: ['embOS', 'MQX', 'FreeRTOS'],
+  },
+  {
+    category: 'Protocols & Communication',
+    skills: ['CAN', 'J1939', 'LIN', 'UART', 'SPI', 'I2C', 'MQTT', 'BLE'],
+  },
+  {
+    category: 'Tools & Debugging',
+    skills: ['Git', 'IAR', 'MPLAB X', 'IBM Rhapsody', 'Lauterbach', 'J-Link', 'Kvaser', 'Peak'],
+  },
+  {
+    category: 'Testing & Validation',
+    skills: ['Unit Testing', 'Integration Testing', 'HIL Testing', 'Polarion'],
+  },
+];
+---
+
+<section id="skills" class="scroll-mt-20 bg-card py-section">
+  <div class="container mx-auto px-4">
+    <h2 class="mb-12 text-3xl font-bold text-foreground md:text-4xl">Technical Skills</h2>
+
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        skillGroups.map((group) => (
+          <div class="rounded-lg border border-border bg-background p-6">
+            <h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-primary">
+              {group.category}
+            </h3>
+            <div class="flex flex-wrap gap-2">
+              {group.skills.map((skill) => (
+                <span class="rounded-md border border-border px-3 py-1 text-sm text-foreground">
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
