@@ -1,0 +1,201 @@
+# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms/schema/sveltia-cms.json
+
+# Sveltia CMS configuration for the portfolio.
+# Editable docs: https://sveltiacms.app/en/docs/
+
+backend:
+  name: github
+  repo: alexenr02/alexenr02.github.io
+  branch: main
+  # Set base_url to the deployed Sveltia CMS Authenticator (Cloudflare Worker)
+  # once the OAuth proxy is live. Until then, you can log in by clicking
+  # "Sign In with Token" on the login screen and pasting a personal access
+  # token (Sveltia provides the link with the right scopes).
+  # base_url: https://your-worker-subdomain.workers.dev
+
+# Default media destination. Per-field media_folder values below override
+# this for specific cases (logos, resume PDF).
+media_folder: public/images
+public_folder: /images
+
+# When true, edits go through pull requests with a draft/in-review/ready
+# workflow. For a single-author personal site, simple direct commits are
+# nicer. Flip to true if you ever want a review buffer.
+publish_mode: simple
+
+collections:
+  # ---------------------------------------------------------------------------
+  # Single-file collections (settings, hero, about, skills)
+  # ---------------------------------------------------------------------------
+
+  - name: site
+    label: Site Settings
+    description: Site-wide name, SEO meta tags, contact email, and social URLs.
+    files:
+      - name: site
+        label: General
+        file: src/content/site/site.json
+        format: json
+        fields:
+          - { name: name, label: Display Name, widget: string }
+          - { name: title, label: SEO Title, widget: string }
+          - { name: description, label: SEO Description, widget: text }
+          - { name: url, label: Site URL, widget: string }
+          - { name: author, label: Author Name, widget: string }
+          - { name: email, label: Contact Email, widget: string }
+          - name: social
+            label: Social Links
+            widget: object
+            fields:
+              - { name: github, label: GitHub URL, widget: string }
+              - { name: linkedin, label: LinkedIn URL, widget: string }
+
+  - name: hero
+    label: Hero Section
+    description: The big headline area at the top of the homepage.
+    files:
+      - name: hero
+        label: Hero
+        file: src/content/hero/hero.json
+        format: json
+        fields:
+          - { name: name, label: Headline (your name), widget: string }
+          - { name: subtitle, label: Subtitle (job title), widget: string }
+          - { name: description, label: Description paragraph, widget: text }
+          - name: primaryCta
+            label: Primary Button
+            widget: object
+            fields:
+              - { name: label, label: Button Label, widget: string }
+              - { name: href, label: Link / anchor, widget: string }
+          - name: secondaryCta
+            label: Secondary Button
+            widget: object
+            fields:
+              - { name: label, label: Button Label, widget: string }
+              - { name: href, label: Link / anchor, widget: string }
+
+  - name: about
+    label: About Section
+    description: About Me copy, achievements, education, and the resume download link.
+    files:
+      - name: about
+        label: About
+        file: src/content/about/about.json
+        format: json
+        fields:
+          - { name: sectionTitle, label: Section Title, widget: string }
+          - { name: subheading, label: Subheading, widget: string }
+          - name: paragraphs
+            label: Paragraphs
+            widget: list
+            field: { name: paragraph, label: Paragraph, widget: text }
+          - name: achievements
+            label: Key Achievements
+            widget: list
+            field: { name: achievement, label: Achievement, widget: string }
+          - name: education
+            label: Education
+            widget: object
+            fields:
+              - { name: school, label: School, widget: string }
+              - { name: degree, label: Degree, widget: string }
+              - { name: note, label: Extra note (e.g. scholarship), widget: string }
+          - name: resume
+            label: Resume Download
+            widget: object
+            fields:
+              - name: path
+                label: Resume PDF
+                widget: file
+                media_folder: /public/resume
+                public_folder: /resume
+              - { name: buttonLabel, label: Button Label, widget: string }
+
+  - name: skills
+    label: Skills Section
+    description: Technical skill groups shown as cards. Drag to reorder.
+    files:
+      - name: skills
+        label: Skills
+        file: src/content/skills/skills.json
+        format: json
+        fields:
+          - { name: sectionTitle, label: Section Title, widget: string }
+          - name: groups
+            label: Skill Groups
+            label_singular: Skill Group
+            widget: list
+            fields:
+              - { name: category, label: Category Name, widget: string }
+              - name: skills
+                label: Skills in this category
+                widget: list
+                field: { name: skill, label: Skill, widget: string }
+
+  # ---------------------------------------------------------------------------
+  # Folder collection (one file per work experience entry)
+  # Schema mirrors src/content/config.ts experience collection.
+  # ---------------------------------------------------------------------------
+
+  - name: experience
+    label: Work Experience
+    label_singular: Experience Entry
+    description: One entry per role. Order field controls timeline order (lower = first).
+    folder: src/content/experience
+    extension: mdx
+    format: yaml-frontmatter
+    create: true
+    slug: '{{order}}-{{slug}}'
+    identifier_field: company
+    summary: '{{position}} at {{company}}'
+    sortable_fields: [order, startDate, company]
+    fields:
+      - { name: company, label: Company, widget: string }
+      - { name: position, label: Position / Title, widget: string }
+      - { name: location, label: Location, widget: string, required: false }
+      - name: logo
+        label: Company Logo
+        widget: image
+        required: false
+        media_folder: /public/images/companies
+        public_folder: /images/companies
+        choose_url: false
+      - { name: logoAlt, label: Logo Alt Text, widget: string, required: false }
+      - name: startDate
+        label: Start Date
+        widget: datetime
+        time_format: false
+        date_format: 'YYYY-MM-DD'
+        format: 'YYYY-MM-DD'
+        picker_utc: true
+      - name: endDate
+        label: End Date (leave empty for current role)
+        widget: datetime
+        required: false
+        time_format: false
+        date_format: 'YYYY-MM-DD'
+        format: 'YYYY-MM-DD'
+        picker_utc: true
+      - { name: description, label: Short Description, widget: text }
+      - name: responsibilities
+        label: Responsibilities / Bullets
+        widget: list
+        required: false
+        field: { name: item, label: Bullet, widget: text }
+      - name: achievements
+        label: Achievements (optional, separate from bullets)
+        widget: list
+        required: false
+        field: { name: item, label: Achievement, widget: string }
+      - name: technologies
+        label: Technology Tags
+        widget: list
+        required: false
+        field: { name: tech, label: Tech, widget: string }
+      - name: order
+        label: Order (lower = first in timeline)
+        widget: number
+        required: false
+        value_type: int
+      - { name: featured, label: Featured, widget: boolean, default: false, required: false }
