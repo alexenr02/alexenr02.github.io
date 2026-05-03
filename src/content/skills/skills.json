@@ -1,0 +1,56 @@
+{
+  "sectionTitle": "Technical Skills",
+  "groups": [
+    {
+      "category": "Languages",
+      "skills": ["Embedded C", "C++", "Python", "PowerShell"]
+    },
+    {
+      "category": "Microcontrollers",
+      "skills": ["ARM Cortex-M4", "ARM Cortex-M7"]
+    },
+    {
+      "category": "RTOS",
+      "skills": ["embOS", "MQX"]
+    },
+    {
+      "category": "Communication & Interfaces",
+      "skills": ["CAN", "J1939", "BLE", "UART", "RS-232"]
+    },
+    {
+      "category": "Tools",
+      "skills": [
+        "J-Link",
+        "Kvaser",
+        "Peak",
+        "BUSMASTER",
+        "Git",
+        "GCC",
+        "IBM Rhapsody",
+        "Polarion",
+        "IBM Jazz/RTC"
+      ]
+    },
+    {
+      "category": "Practices & Methods",
+      "skills": [
+        "V-model development",
+        "HIL testing",
+        "Hardware bring-up",
+        "Requirements traceability",
+        "Agile/Scrum"
+      ]
+    },
+    {
+      "category": "Lab Equipment",
+      "skills": [
+        "Oscilloscope",
+        "Spectrum analyzer",
+        "CAN bus sniffer",
+        "Multimeter",
+        "Soldering",
+        "Harness building"
+      ]
+    }
+  ]
+}

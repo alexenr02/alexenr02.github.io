@@ -1,13 +1,13 @@
 ---
 // Homepage
-// Main landing page with all sections
+// Hero copy comes from src/content/hero/hero.json (editable via /admin)
 
 import BaseLayout from '@layouts/BaseLayout.astro';
 import About from '@components/sections/About.astro';
 import Skills from '@components/sections/Skills.astro';
 import WorkExperience from '@components/sections/WorkExperience.astro';
 import Contact from '@components/sections/Contact.astro';
-import { SITE } from '@lib/constants';
+import hero from '../content/hero/hero.json';
 ---
 
 <BaseLayout>
@@ -18,24 +18,24 @@ import { SITE } from '@lib/constants';
   >
     <div class="container mx-auto text-center">
       <h1 class="mb-4 text-5xl font-bold text-foreground md:text-6xl lg:text-7xl">
-        Alejandro Enriquez
+        {hero.name}
       </h1>
-      <p class="mb-8 text-xl text-secondary md:text-2xl">Embedded Software Engineer</p>
+      <p class="mb-8 text-xl text-secondary md:text-2xl">{hero.subtitle}</p>
       <p class="mx-auto mb-8 max-w-2xl text-lg text-secondary">
-        {SITE.description}
+        {hero.description}
       </p>
       <div class="flex flex-wrap justify-center gap-4">
         <a
-          href="#contact"
+          href={hero.primaryCta.href}
           class="hover:bg-primary/90 rounded-lg bg-primary px-6 py-3 font-medium text-white transition-colors"
         >
-          Get in Touch
+          {hero.primaryCta.label}
         </a>
         <a
-          href="#projects"
+          href={hero.secondaryCta.href}
           class="rounded-lg border border-border px-6 py-3 font-medium text-foreground transition-colors hover:bg-card"
         >
-          View Projects
+          {hero.secondaryCta.label}
         </a>
       </div>
     </div>

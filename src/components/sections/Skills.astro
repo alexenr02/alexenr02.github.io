@@ -1,69 +1,17 @@
 ---
 // Skills section
-// Grouped by category, derived from resume Technical Competencies
+// Categories and skills come from src/content/skills/skills.json
 
-const skillGroups = [
-  {
-    category: 'Languages',
-    skills: ['Embedded C', 'C++', 'Python', 'PowerShell'],
-  },
-  {
-    category: 'Microcontrollers',
-    skills: ['ARM Cortex-M4', 'ARM Cortex-M7'],
-  },
-  {
-    category: 'RTOS',
-    skills: ['embOS', 'MQX'],
-  },
-  {
-    category: 'Communication & Interfaces',
-    skills: ['CAN', 'J1939', 'BLE', 'UART', 'RS-232'],
-  },
-  {
-    category: 'Tools',
-    skills: [
-      'J-Link',
-      'Kvaser',
-      'Peak',
-      'BUSMASTER',
-      'Git',
-      'GCC',
-      'IBM Rhapsody',
-      'Polarion',
-      'IBM Jazz/RTC',
-    ],
-  },
-  {
-    category: 'Practices & Methods',
-    skills: [
-      'V-model development',
-      'HIL testing',
-      'Hardware bring-up',
-      'Requirements traceability',
-      'Agile/Scrum',
-    ],
-  },
-  {
-    category: 'Lab Equipment',
-    skills: [
-      'Oscilloscope',
-      'Spectrum analyzer',
-      'CAN bus sniffer',
-      'Multimeter',
-      'Soldering',
-      'Harness building',
-    ],
-  },
-];
+import skills from '../../content/skills/skills.json';
 ---
 
 <section id="skills" class="scroll-mt-20 bg-card py-section">
   <div class="container mx-auto px-4">
-    <h2 class="mb-12 text-3xl font-bold text-foreground md:text-4xl">Technical Skills</h2>
+    <h2 class="mb-12 text-3xl font-bold text-foreground md:text-4xl">{skills.sectionTitle}</h2>
 
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {
-        skillGroups.map((group) => (
+        skills.groups.map((group) => (
           <div class="rounded-lg border border-border bg-background p-6">
             <h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-primary">
               {group.category}

@@ -1,18 +1,21 @@
 // Site-wide constants and configuration
+// SITE and SOCIAL_LINKS are sourced from src/content/site/site.json so the
+// Sveltia CMS admin can edit them without touching code.
+
+import siteData from '../content/site/site.json';
 
 export const SITE = {
-  name: 'Alejandro Enriquez',
-  title: 'Alejandro Enriquez - Embedded Software Engineer',
-  description:
-    'Embedded Software Engineer with 4 years developing safety-critical firmware on CAN-based multi-ECU architectures. Proven ability to own problems end-to-end, from hardware bring-up to manufacturing support. Experienced in V-model, HIL, and cross-site collaboration.',
-  url: 'https://alexenr02.github.io',
-  author: 'Alejandro Enriquez',
-  email: 'aelejandro9@proton.me',
+  name: siteData.name,
+  title: siteData.title,
+  description: siteData.description,
+  url: siteData.url,
+  author: siteData.author,
+  email: siteData.email,
 } as const;
 
 export const SOCIAL_LINKS = {
-  github: 'https://github.com/alexenr02',
-  linkedin: 'https://www.linkedin.com/in/alexenr/',
+  github: siteData.social.github,
+  linkedin: siteData.social.linkedin,
 } as const;
 
 export const NAV_ITEMS = [
