@@ -44,10 +44,23 @@ function formatDate(date?: Date): string {
               <!-- Content card -->
               <div class="flex-1 rounded-lg border border-border bg-card p-6 transition-colors hover:border-primary/40">
                 <!-- Header -->
-                <div class="mb-3 flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <h3 class="text-lg font-semibold text-foreground">{entry.data.position}</h3>
-                    <p class="text-base font-medium text-primary">{entry.data.company}</p>
+                <div class="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div class="flex items-start gap-3">
+                    {entry.data.logo && (
+                      <div class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-white p-1">
+                        <img
+                          src={entry.data.logo}
+                          alt={entry.data.logoAlt ?? `${entry.data.company} logo`}
+                          loading="lazy"
+                          decoding="async"
+                          class="h-full w-full object-contain"
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <h3 class="text-lg font-semibold text-foreground">{entry.data.position}</h3>
+                      <p class="text-base font-medium text-primary">{entry.data.company}</p>
+                    </div>
                   </div>
                   {entry.data.location && (
                     <span class="shrink-0 text-sm text-secondary">{entry.data.location}</span>
