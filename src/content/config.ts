@@ -46,6 +46,10 @@ const experience = defineCollection({
     company: z.string(),
     position: z.string(),
     location: z.string().optional(),
+    // Path under /public, e.g. "/images/companies/carrier.png"
+    logo: z.string().optional(),
+    // Alt text for the logo (defaults to company name in component)
+    logoAlt: z.string().optional(),
 
     // Dates
     startDate: z.date(),

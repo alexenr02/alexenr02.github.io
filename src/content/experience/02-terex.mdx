@@ -1,25 +1,31 @@
 ---
 company: "Terex Corporation"
 position: "Embedded Software Engineer"
-location: "Nuevo León, México"
+location: "Monterrey, Nuevo León, México"
+logo: "/images/companies/genie.webp"
+logoAlt: "Genie (Terex Aerial Work Platforms) logo"
 startDate: 2023-03-01
 endDate: 2025-05-01
-description: "Designed and re-architected embedded software modules for industrial lifting platforms using C/C++ and IBM Rhapsody."
+description: "Developed firmware for a new rough terrain scissor lift prototype (Mule) on a CAN-based multi-ECU architecture, and led cross-site collaboration between Monterrey, Seattle HQ, and the Changzhou factory."
 responsibilities:
-  - "Designed and re-architected embedded software modules for industrial lifting platforms using C/C++ and IBM Rhapsody."
-  - "Refactored and extended legacy codebases to support new feature sets and hardware variants."
-  - "Debugged and validated CAN-based communication using Kvaser and Lauterbach tools."
-  - "Supported global prototype testing on-site in Changzhou, China and collaborated with systems teams in the USA, India, and China."
-  - "Participated in requirement refinement, validation planning, and coordinated global testing rounds using Polarion."
-  - "Contributed to software architecture decisions enabling reuse across multiple hardware variants and product lines."
-  - "Supported factory logistics for an all-terrain scissor prototype (8 tons, 4 wheels) shipped from China to Monterrey."
+  - "Developed firmware for a new rough terrain scissor lift prototype (Mule) from scratch. Implemented platform lift, lower, and outrigger actuation on a CAN-based multi-ECU architecture using IBM Rhapsody UML statecharts."
+  - "Proposed and implemented a redesigned hydraulic software architecture, decomposing a monolithic handler into a dedicated statechart class with event-driven coupling, improving modularity and reducing inter-component dependencies."
+  - "Developed the Kubota engine driver (ECON module) and built a CAN node simulator in BUSMASTER to keep development moving while a faulty magnetic relay in the Monterrey unit was being diagnosed."
+  - "Implemented per-wheel PID torque balancing for the hybrid drivetrain."
+  - "Recovered a prototype that arrived non-functional in a shipping container under deadline pressure, diagnosing cascading issues (discharged battery, multiple CAN errors, erratic behavior) and tracing the root cause to a phantom load cell module incorrectly connected during factory build."
+  - "Authored Polarion requirements for the full scissor lift family and linked them to test cases; led 30+ test case executions on physical machines, logging failures and driving fixes through full fix-verify cycles."
+  - "Performed HIL testing using a full machine simulator, validating firmware across multiple scissor lift variants, catching integration bugs before factory deployment."
+  - "Led cross-site knowledge transfer between Monterrey, Seattle HQ, and the Changzhou factory, collaborating with core engineering and manufacturing teams across three countries."
 technologies:
-  - "C/C++"
+  - "Embedded C"
+  - "C++"
   - "IBM Rhapsody"
+  - "UML statecharts"
   - "CAN"
+  - "BUSMASTER"
   - "Kvaser"
-  - "Lauterbach"
   - "Polarion"
+  - "HIL Testing"
 order: 2
 featured: true
 ---
