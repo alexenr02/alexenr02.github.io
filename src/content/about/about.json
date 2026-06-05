@@ -2,13 +2,12 @@
   "sectionTitle": "About Me",
   "subheading": "Firmware & Embedded Software Engineer",
   "paragraphs": [
-    "Embedded Software Engineer with 4 years developing safety-critical firmware on CAN-based multi-ECU architectures. Proven ability to own problems end-to-end, from hardware bring-up to manufacturing support.",
+    "Embedded Software Engineer with 4 years developing firmware on CAN-based multi-ECU architectures. Proven ability to own problems end-to-end, from hardware bring-up to manufacturing support.",
     "Delivered a cross-generation Software Thread Watchdog (ARM Cortex-M4/embOS and Cortex-M7/MQX), reduced build times by ~65%, and unblocked stalled production lines. Experienced in V-model development, HIL testing, and cross-site collaboration with teams across Mexico, the US, and China."
   ],
   "achievements": [
     "65% faster builds (20+ min down to ~7 min)",
     "2 production-critical products unblocked from PPAP",
-    "3+ years shipping safety-critical firmware",
     "Cross-generation Software Thread Watchdog deployed on two hardware platforms (embOS & MQX)"
   ],
   "education": {
