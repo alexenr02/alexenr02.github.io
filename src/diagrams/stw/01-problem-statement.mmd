@@ -1,0 +1,15 @@
+flowchart TD
+    HW["Hardware Watchdog\n(board-level timer)"]
+    SERV["Servicing context\nstill running"]
+    HW -- "timer serviced - no reset" --> SERV
+
+    SERV --> S1["Single-task starvation\nHigh-priority task spins;\nlow-priority task never scheduled"]
+    SERV --> S2["Deadlock / priority inversion\nSubset of tasks stall on\nshared resource"]
+    SERV --> S3["Silent logical hang\nTask stays ready but stuck\nin loop or unreachable event"]
+    SERV --> S4["No diagnosability\nReset discards context;\nwhich subsystem failed is unknown"]
+
+    S1 & S2 & S3 & S4 --> STW
+
+    STW["Software Thread Watchdog\nMonitors each task individually\nfor forward progress"]
+    STW --> D["CAN diagnostic frame\nnames the specific stalled task\nbefore system-level recovery"]
+    STW --> HW2["Hardware watchdog\nremains last line of defense"]

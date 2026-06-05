@@ -18,7 +18,8 @@ const projects = defineCollection({
       tags: z.array(z.string()).optional(),
 
       // Media
-      thumbnail: image(),
+      // Optional: cards fall back to a styled cover when no thumbnail is set.
+      thumbnail: image().optional(),
       ogImage: z.string().optional(), // Manual OG image path per project
 
       // Links

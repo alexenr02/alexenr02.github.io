@@ -16,6 +16,7 @@
     "@astrojs/sitemap": "^3.7.0",
     "@astrojs/svelte": "^7.2.5",
     "@astrojs/tailwind": "^6.0.2",
+    "@mermaid-js/layout-elk": "^0.2.1",
     "@sentry/astro": "^10.35.0",
     "@tailwindcss/forms": "^0.5.11",
     "@tailwindcss/typography": "^0.5.19",
@@ -23,6 +24,7 @@
     "astro-compress": "^2.3.9",
     "autoprefixer": "^10.4.23",
     "lucide-svelte": "^0.562.0",
+    "mermaid": "^11.15.0",
     "svelte": "^5.47.1",
     "tailwindcss": "^3.4.19",
     "zod": "^3.22.0"

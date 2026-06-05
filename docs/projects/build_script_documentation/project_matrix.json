@@ -1,0 +1,189 @@
+{
+    "maturities": [
+        {
+            "option": "1",
+            "label": "SQA",
+            "implemented": true
+        },
+        {
+            "option": "2",
+            "label": "Field Trial",
+            "implemented": true
+        },
+        {
+            "option": "3",
+            "label": "Production",
+            "implemented": true
+        }
+    ],
+    "tools": {
+        "build_tool 7.4": {
+            "env_var": "BUILD_TOOL_74_HOME",
+            "relative_exe": "common/bin/build_tool.exe",
+            "fallback_exe": "/path/to/tools/build_tool/7.4/common/bin/build_tool.exe"
+        },
+        "build_tool 8.4": {
+            "env_var": "BUILD_TOOL_84_HOME",
+            "relative_exe": "common/bin/build_tool.exe",
+            "fallback_exe": "/path/to/tools/build_tool/8.4/common/bin/build_tool.exe"
+        },
+        "ide_tool": {
+            "env_var": "IDE_TOOL_HOME",
+            "relative_exe": "eclipse/ide_tool.exe",
+            "fallback_exe": "/path/to/tools/ide_tool/eclipse/ide_tool.exe"
+        }
+    },
+    "families": {
+        "SW1": {
+            "menu_option": "1",
+            "label": "ProductA",
+            "code": "PRODA",
+            "bat_script": "Populate_ProductA.bat",
+            "projects": [
+                {
+                    "name": "proda_main",
+                    "workspace": "../ProductA_Main/ProductA_Main.btw",
+                    "project": "ProductA_Main.btp",
+                    "tool": "build_tool 7.4",
+                    "build_modes": {
+                        "SQA": {
+                            "configuration": "SQA_TEST_MAIN",
+                            "artifact": "../ProductA_Main/Output/SQA_TEST_MAIN/Exe/main_module.hex"
+                        },
+                        "Field Trial": {
+                            "configuration": "FIELD_TRIAL_MAIN",
+                            "artifact": "../ProductA_Main/Output/FIELD_TRIAL_MAIN/Exe/main_module.hex"
+                        },
+                        "Production": {
+                            "configuration": "PRODUCTION_MAIN",
+                            "artifact": "../ProductA_Main/Output/PRODUCTION_MAIN/Exe/main_module.hex"
+                        }
+                    },
+                    "all_configurations": [
+                        "DEBUG_MAIN",
+                        "SQA_TEST_MAIN",
+                        "FIELD_TRIAL_MAIN",
+                        "PRODUCTION_MAIN"
+                    ]
+                },
+                {
+                    "name": "proda_display",
+                    "workspace": "../ProductA_Display/ProductA_Display.btw",
+                    "project": "ProductA_Display.btp",
+                    "tool": "build_tool 7.4",
+                    "build_modes": {
+                        "SQA": {
+                            "configuration": "SQA_TEST_DISPLAY",
+                            "artifact": "../ProductA_Display/Output/SQA_TEST_DISPLAY/Exe/display_module.hex"
+                        },
+                        "Field Trial": {
+                            "configuration": "FIELD_TRIAL_DISPLAY",
+                            "artifact": "../ProductA_Display/Output/FIELD_TRIAL_DISPLAY/Exe/display_module.hex"
+                        },
+                        "Production": {
+                            "configuration": "PRODUCTION_DISPLAY",
+                            "artifact": "../ProductA_Display/Output/PRODUCTION_DISPLAY/Exe/display_module.hex"
+                        }
+                    },
+                    "all_configurations": [
+                        "DEBUG_DISPLAY",
+                        "SQA_TEST_DISPLAY",
+                        "FIELD_TRIAL_DISPLAY",
+                        "PRODUCTION_DISPLAY"
+                    ]
+                },
+                {
+                    "name": "proda_display_next",
+                    "workspace": "../ProductA_DisplayNext/ProductA_DisplayNext.itp",
+                    "project": "ProductA_DisplayNext.itp",
+                    "tool": "ide_tool",
+                    "build_modes": {
+                        "SQA": {
+                            "configuration": "SQA_TEST_DISPLAY_NEXT",
+                            "artifact": "../ProductA_DisplayNext/SQA_TEST_DISPLAY_NEXT/display_next.hex"
+                        },
+                        "Field Trial": {
+                            "configuration": "FIELD_TRIAL_DISPLAY_NEXT",
+                            "artifact": "../ProductA_DisplayNext/FIELD_TRIAL_DISPLAY_NEXT/display_next.hex"
+                        },
+                        "Production": {
+                            "configuration": "PRODUCTION_DISPLAY_NEXT",
+                            "artifact": "../ProductA_DisplayNext/PRODUCTION_DISPLAY_NEXT/display_next.hex"
+                        }
+                    },
+                    "all_configurations": [
+                        "DEBUG_DISPLAY_NEXT",
+                        "SQA_TEST_DISPLAY_NEXT",
+                        "FIELD_TRIAL_DISPLAY_NEXT",
+                        "PRODUCTION_DISPLAY_NEXT"
+                    ]
+                }
+            ]
+        },
+        "SW2": {
+            "menu_option": "2",
+            "label": "ProductB",
+            "code": "PRODB",
+            "bat_script": "Populate_ProductB.bat",
+            "projects": [
+                {
+                    "name": "prodb_main",
+                    "workspace": "../ProductB_Main/ProductB_Main.btw",
+                    "project": "ProductB_Main.btp",
+                    "tool": "build_tool 8.4",
+                    "build_modes": {
+                        "SQA": {
+                            "configuration": "SQA_TEST_MAIN",
+                            "artifact": "../ProductB_Main/Output/SQA_TEST_MAIN/Exe/main_module.hex"
+                        },
+                        "Field Trial": {
+                            "configuration": "FIELD_TRIAL_MAIN",
+                            "artifact": "../ProductB_Main/Output/FIELD_TRIAL_MAIN/Exe/main_module.hex"
+                        },
+                        "Production": {
+                            "configuration": "PRODUCTION_MAIN",
+                            "artifact": "../ProductB_Main/Output/PRODUCTION_MAIN/Exe/main_module.hex"
+                        }
+                    },
+                    "all_configurations": [
+                        "DEBUG_MAIN",
+                        "SQA_TEST_MAIN",
+                        "FIELD_TRIAL_MAIN",
+                        "PRODUCTION_MAIN"
+                    ]
+                },
+                {
+                    "name": "prodb_display",
+                    "workspace": "../ProductB_Display/ProductB_Display.itp",
+                    "project": "ProductB_Display.itp",
+                    "tool": "ide_tool",
+                    "build_modes": {
+                        "SQA": {
+                            "configuration": "SQA_TEST_DISPLAY",
+                            "artifact": "../ProductB_Display/SQA_TEST_DISPLAY/display_module.hex"
+                        },
+                        "Field Trial": {
+                            "configuration": "FIELD_TRIAL_DISPLAY",
+                            "artifact": "../ProductB_Display/FIELD_TRIAL_DISPLAY/display_module.hex"
+                        },
+                        "Production": {
+                            "configuration": "PRODUCTION_DISPLAY",
+                            "artifact": "../ProductB_Display/PRODUCTION_DISPLAY/display_module.hex"
+                        }
+                    },
+                    "all_configurations": [
+                        "DEBUG_DISPLAY",
+                        "SQA_TEST_DISPLAY",
+                        "FIELD_TRIAL_DISPLAY",
+                        "PRODUCTION_DISPLAY"
+                    ]
+                }
+            ]
+        }
+    },
+    "maturity_build_keys": [
+        "SQA",
+        "Field Trial",
+        "Production"
+    ]
+}

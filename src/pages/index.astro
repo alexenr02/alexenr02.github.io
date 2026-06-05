@@ -6,6 +6,7 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import About from '@components/sections/About.astro';
 import Skills from '@components/sections/Skills.astro';
 import WorkExperience from '@components/sections/WorkExperience.astro';
+import Projects from '@components/sections/Projects.astro';
 import Contact from '@components/sections/Contact.astro';
 import hero from '../content/hero/hero.json';
 ---
@@ -50,13 +51,8 @@ import hero from '../content/hero/hero.json';
   <!-- Work Experience Section -->
   <WorkExperience />
 
-  <!-- Projects Section (Placeholder) -->
-  <section id="projects" class="scroll-mt-20 bg-card py-section">
-    <div class="container mx-auto px-4">
-      <h2 class="mb-8 text-3xl font-bold text-foreground md:text-4xl">Projects</h2>
-      <p class="text-lg text-secondary">Project showcase will be implemented in Phase 3.</p>
-    </div>
-  </section>
+  <!-- Projects Section -->
+  <Projects />
 
   <!-- Lab/Experiments Section (Placeholder) -->
   <section id="lab" class="scroll-mt-20 py-section">

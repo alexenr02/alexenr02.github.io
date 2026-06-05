@@ -1,0 +1,18 @@
+flowchart TD
+    subgraph Slot["Slot (one per task)"]
+        ID["Task ID"]
+        NAME["ASCII short name"]
+        CTR["live progress counter\n(volatile uint32)"]
+        SNAP["monitor's last snapshot"]
+        MISS["consecutive-miss counter"]
+        THR["per-task miss threshold"]
+        FLAGS["active / registered flags"]
+        STATE["health state"]
+    end
+
+    TASK["Monitored Task"] -- "counter++\n(lock-free)" --> CTR
+    MONITOR["Monitor Task\n(1 Hz cycle)"] -- "reads" --> CTR
+    MONITOR -- "updates" --> SNAP
+    MONITOR -- "updates" --> MISS
+    MONITOR -- "updates" --> STATE
+    STATE -- "Timeout" --> CAN["CAN diagnostic frame\n(queued, sent after loop)"]

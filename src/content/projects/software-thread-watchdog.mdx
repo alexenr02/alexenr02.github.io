@@ -1,0 +1,276 @@
+---
+title: 'Software Thread Watchdog'
+description: 'A per-task software watchdog for two RTOS-based MCUs that detects stalled tasks by forward progress and reports the exact failing task over CAN, before any system-level recovery.'
+category: 'Embedded'
+techStack:
+  - 'Embedded C'
+  - 'ARM Cortex-M4'
+  - 'ARM Cortex-M7'
+  - 'embOS'
+  - 'MQX'
+  - 'CAN / J1939'
+  - 'RTOS'
+tags:
+  - 'Safety-critical'
+  - 'Diagnostics'
+  - 'Cross-platform'
+thumbnail: './stw-cover.png'
+date: 2025-09-01
+featured: true
+order: 1
+---
+
+import Mermaid from '@components/common/Mermaid.astro';
+import problemStatement from '../../diagrams/stw/01-problem-statement.mmd?raw';
+import designEvolution from '../../diagrams/stw/02-design-evolution.mmd?raw';
+import stateMachine from '../../diagrams/stw/03-state-machine.mmd?raw';
+import slotModel from '../../diagrams/stw/03-slot-model.mmd?raw';
+import frameLayout from '../../diagrams/stw/04-frame-layout.mmd?raw';
+import faultFlow from '../../diagrams/stw/04-fault-flow.mmd?raw';
+import crossPlatform from '../../diagrams/stw/05-cross-platform.mmd?raw';
+
+## 1. Problem Statement
+
+The platform runs on two microcontrollers, each hosting a preemptive RTOS and a
+set of cooperating application tasks. A conventional hardware watchdog already
+guards the system at the lowest level: if the firmware fails to service the
+hardware timer within its window, the board resets.
+
+The hardware watchdog only proves that *something* is still able to service the
+timer. It cannot prove that *every* functional task is still making progress.
+The failure modes that motivated a software-level watchdog are:
+
+- **Single-task starvation.** A high-priority task spins or blocks indefinitely
+  while a lower-priority task never gets scheduled. The servicing context still
+  runs, so the hardware watchdog is satisfied, but a functional task has
+  effectively died.
+- **Deadlock or priority inversion on a subset of tasks.** Two or more tasks
+  stall on a shared resource while the rest of the system keeps running.
+- **Silent logical hangs.** A task remains "ready" but is stuck in a loop or
+  waiting on an event that will never arrive. Nothing crashes; the task simply
+  stops producing work.
+- **Loss of diagnosability.** When the hardware watchdog fires, it resets the
+  device and discards the context. There is no record of *which* subsystem
+  failed.
+
+The Software Thread Watchdog (STW) addresses these by monitoring each registered
+task individually for forward progress and emitting a diagnostic over the CAN bus
+that names the specific task that stalled, before any system-level recovery is
+taken. The hardware watchdog remains the last line of defense; the STW adds
+per-task observability above it.
+
+<Mermaid code={problemStatement} caption="A hardware watchdog only confirms the servicing context runs. The STW watches each task and names the one that stalled." />
+
+## 2. Design Evolution: Timestamp-Based to Counter-Based
+
+### First approach: timestamps
+
+The initial design had each monitored task record a wall-clock timestamp on
+every iteration of its main loop. The monitoring task periodically compared the
+current time against each task's last recorded timestamp; if the difference
+exceeded a per-task limit, the task was declared stalled.
+
+This design was discarded for several reasons:
+
+- **Critical sections in the hot path.** A timestamp is a multi-byte value, and
+  obtaining "current time" is itself a multi-step read of a system time source.
+  To prevent the monitor from reading a half-updated timestamp, the heartbeat
+  update had to be wrapped in a critical section. That critical section sat in the
+  *most frequently executed* path in the system: every task, every loop
+  iteration. The result was measurable scheduling jitter and lock contention
+  introduced by the very mechanism meant to be lightweight.
+- **False alarms.** The comparison depended on a shared time base. Counter/clock
+  wraparound, coarse tick resolution, and the ordering of the "read time / store
+  time / compare time" steps across two threads produced spurious timeouts on
+  tasks that were in fact healthy.
+- **Stack and reentrancy behavior.** Pulling time into each task's loop added
+  per-task call depth and made the heartbeat dependent on a shared time service
+  being reentrant and cheap from every calling context.
+
+### Second approach: monotonic counters
+
+The timestamp was replaced with a single monotonic counter per task. The
+heartbeat operation became one unsynchronized increment of a `volatile` 32-bit
+counter:
+
+```c
+// on each task loop iteration
+task_counter[id]++;   // volatile, lock-free, no time read
+```
+
+The monitoring task does not read absolute time at all. Once per check cycle it
+compares each task's current counter against a private snapshot it took on the
+previous cycle:
+
+```c
+// each check cycle, for each active task
+if (counter != last_snapshot) {
+    last_snapshot = counter;   // task advanced -> healthy
+    misses = 0;
+} else {
+    misses++;                  // no progress this cycle
+}
+```
+
+Why this resolves the earlier problems:
+
+- **No lock in the heartbeat path.** A single aligned 32-bit write is atomic on
+  the target architectures, so the increment needs no critical section. The worst
+  case is the monitor seeing the pre- or post-increment value, and either is
+  correct because the *only* thing that matters is whether the value changed.
+- **No false alarms from timing.** Detection is based on *change*, not elapsed
+  wall-clock time. There is no shared clock to wrap and no tick resolution to
+  misjudge. A task that ran even once between cycles is provably alive.
+- **Trivial, predictable cost.** The heartbeat adds one memory write and no call
+  into a time service, so it does not perturb task stack depth or timing.
+
+Critical sections did not disappear entirely; they were moved out of the
+heartbeat path and confined to the administrative operations that write several
+slot fields at once (registration, activation, start, stop). Those run rarely
+and must present a consistent slot to the monitor. The high-frequency path is now
+lock-free.
+
+<Mermaid code={designEvolution} caption="The timestamp heartbeat carried a critical section and a clock dependency. The counter heartbeat is a single lock-free write." />
+
+## 3. Architecture
+
+### Slot model
+
+Each monitored task owns one slot in a fixed-size table, indexed directly by the
+task's ID. A slot holds the task's identity, its ASCII short name, the live
+progress counter, the monitor's last counter snapshot, a consecutive-miss
+counter, the per-task miss threshold, active and registered flags, and a health
+state. The health state is one of: unregistered, healthy, warning, timeout, or
+inactive.
+
+A per-task configuration table holds the static parameters: the task ID, a short
+human-readable name, and the miss threshold expressed in check cycles (one cycle
+equals one second). Keeping these in one table makes the thresholds reviewable in
+a single place and decouples them from the runtime state.
+
+### Registration
+
+The system follows an explicit lifecycle: initialize, register tasks, then
+start.
+
+- **Initialize** clears every slot to a known default and marks the monitor as
+  not started.
+- **Register** is called by each task. Registration uses the task ID as the slot
+  index, copies the name and miss threshold from the configuration table, zeroes
+  the runtime counters, and marks the slot registered. The snapshot is seeded so
+  the task is not immediately flagged as stalled before it has had a chance to
+  run. Registration returns a result code distinguishing success, duplicate
+  registration, and invalid ID.
+- **Start** activates every registered task at once. For each task it re-syncs the
+  monitor's snapshot to the current counter value so the registration-to-start
+  interval is not misread as missed progress, then clears the miss counter and
+  sets the task healthy.
+
+Tasks can also be individually activated or deactivated, and unregistered.
+Deactivation pauses evaluation without losing the slot; reactivation re-syncs the
+snapshot so the idle period is not counted as missed progress. These multi-field
+updates run inside a critical section so the monitor never observes a partially
+updated slot.
+
+<Mermaid code={stateMachine} label="Task slot state machine" caption="Each task moves through these states; the monitor drives the health transitions on the right." />
+
+### Monitoring loop
+
+The monitoring task runs the check routine once per cycle. For each registered,
+active task with a valid threshold:
+
+- If the counter has changed since the last snapshot, the task made progress:
+  update the snapshot, reset the miss counter, mark healthy.
+- If the counter is unchanged, increment the miss counter. The first missed cycle
+  moves the task to a warning state (a grace period that absorbs a single late
+  cycle). When the miss counter reaches the task's threshold, the task moves to
+  timeout.
+
+<Mermaid code={slotModel} label="Slot model and data flow" caption="The task only ever writes its counter; the monitor reads it and owns every other field in the slot." />
+
+### Reaction to a missed threshold
+
+On the transition into timeout, the monitor builds a diagnostic frame for that
+task and queues it. A state guard ensures the alarm fires exactly once per stall
+episode: while the task remains stalled past its threshold, it stays in the
+timeout state and no duplicate frames are produced. Recovery (the counter
+starting to advance again) returns the task to healthy and re-arms the one-shot.
+
+Two details matter for real-time behavior:
+
+- **Bounded fault batch.** The number of fault frames produced in a single cycle
+  is capped, sized to the maximum number of tasks expected to stall
+  simultaneously, so the routine has a bounded worst case.
+- **Transmission outside the evaluation loop.** Frames are accumulated during
+  evaluation but transmitted only after the loop completes, and the system alarm
+  is signaled there as well. This keeps bus transmission latency from delaying the
+  inspection of the remaining tasks within the same cycle.
+
+## 4. CAN Diagnostic Reporting
+
+When a task times out, the monitor emits a fixed 8-byte diagnostic frame on a
+dedicated identifier. The frame is self-describing so it can be read directly
+from a bus trace without external tooling.
+
+<Mermaid code={frameLayout} label="8-byte diagnostic frame layout" caption="Every byte is self-describing so a fault is interpretable straight from a raw bus trace." />
+
+| Byte | Field                 | Purpose                                                                  |
+| ---- | --------------------- | ------------------------------------------------------------------------ |
+| 0    | Task ID               | Numeric identifier of the stalled task; the primary key for the fault.   |
+| 1    | ASCII identifier, 1st | First character of the task's short name, for human-readable triage.     |
+| 2    | ASCII identifier, 2nd | Second character of the short name; together with byte 1, a quick label. |
+| 3    | Missed count          | Consecutive check cycles with no progress at the moment of timeout.      |
+| 4    | Threshold             | The task's configured miss limit, so the fault is interpretable alone.   |
+| 5    | Registered task count | How many tasks were under monitoring, for context on system state.       |
+| 6    | Marker                | Fixed sentinel byte for frame validation and quick visual scanning.      |
+| 7    | Marker                | Second fixed sentinel, reinforcing identification of a watchdog fault.   |
+
+Design intent of each field:
+
+- The **numeric task ID** is the unambiguous machine-readable key; the **two
+  ASCII characters** let a human reading a raw trace recognize the subsystem
+  without a lookup table. If a name is missing, a placeholder character is
+  substituted so the field is always populated.
+- The **missed count** and **threshold** together convey both *what happened* and
+  *what the limit was*, making the frame interpretable in isolation.
+- The **registered task count** gives the reader a snapshot of how much of the
+  system was being monitored at the time of the fault.
+- The **two marker bytes** are constant sentinels. They make watchdog faults
+  trivial to spot and filter in a busy trace and provide a cheap sanity check
+  that a captured frame is in fact a watchdog fault.
+
+A separate set of debug-only frames (compiled out of production builds) exposes
+per-function state and periodic per-task status snapshots for bring-up and
+verification.
+
+<Mermaid code={faultFlow} label="Fault reporting flow" caption="Frames are built during evaluation but only transmitted after the loop, so bus latency never delays the remaining checks." />
+
+## 5. Cross-Platform Notes
+
+The watchdog is shared source compiled for two different MCUs running two
+different operating systems: the first MCU and the second MCU each host their own
+RTOS. The core logic, slot model, counter heartbeat, monitoring loop, and
+diagnostic frame are identical on both. The differences were isolated behind
+compile-time selection:
+
+- **Configuration struct layout.** One platform carries an extra per-task
+  parameter used only by the test-stall path; the other does not. To keep a
+  single initializer table valid on both, the per-task entries are built through a
+  macro that emits the correct field set for the active platform.
+- **Critical section primitive.** Each platform supplies its own critical-section
+  implementation under a platform-specific include. The watchdog selects the
+  correct one at compile time and uses a common scoped wrapper.
+- **Intentional stall for testing.** A debug-only path lets a chosen task be
+  forced to stop reporting progress to validate detection end to end. On one
+  platform the task blocks on a semaphore for a configured number of ticks and
+  then resumes automatically; on the other the task is suspended through the OS
+  scheduler. Both paths are excluded from production builds.
+- **Atomicity assumption.** The lock-free heartbeat relies on an aligned 32-bit
+  write being atomic. This holds on both 32-bit cores used here, so the same
+  lock-free increment is valid on both platforms without modification.
+
+Everything outside these four points, the public API, the state machine, the
+thresholds table, and the fault-frame format, is common code, which keeps the two
+builds behaviorally consistent and the logic maintained in one place.
+
+<Mermaid code={crossPlatform} caption="One shared source base; only four well-isolated points differ between the two MCU/RTOS targets." />

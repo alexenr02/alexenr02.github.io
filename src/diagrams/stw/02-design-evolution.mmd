@@ -1,0 +1,37 @@
+flowchart LR
+    subgraph V1["Approach 1 - Timestamps (discarded)"]
+        direction TB
+        T1["Task loop iteration"]
+        T2["Read current wall-clock time\n(multi-step, shared source)"]
+        T3["Enter critical section"]
+        T4["Write timestamp\n(multi-byte value)"]
+        T5["Exit critical section"]
+        T1 --> T2 --> T3 --> T4 --> T5
+
+        P1["Problems"]
+        P1 --> PA["Critical section in hot path\nscheduling jitter and contention"]
+        P1 --> PB["False alarms from clock\nwraparound / tick resolution"]
+        P1 --> PC["Shared time service coupling\nadds stack depth and reentrancy risk"]
+    end
+
+    subgraph V2["Approach 2 - Monotonic Counters (adopted)"]
+        direction TB
+        C1["Task loop iteration"]
+        C2["task_counter[id]++\n(volatile 32-bit, lock-free)"]
+        C1 --> C2
+
+        M1["Monitor (once per cycle)"]
+        M2{"counter !=\nlast_snapshot?"}
+        M3["Update snapshot\nReset miss count\nMark HEALTHY"]
+        M4["Increment miss count"]
+        M1 --> M2
+        M2 -- Yes --> M3
+        M2 -- No --> M4
+
+        R1["Benefits"]
+        R1 --> RA["No lock in heartbeat path\naligned 32-bit write is atomic"]
+        R1 --> RB["No shared clock - detects\nchange, not elapsed time"]
+        R1 --> RC["One memory write per iteration\nno call into time service"]
+    end
+
+    V1 -- "replaced by" --> V2

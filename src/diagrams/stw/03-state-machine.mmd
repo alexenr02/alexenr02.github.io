@@ -1,0 +1,13 @@
+stateDiagram-v2
+    direction TB
+    [*] --> Unregistered : initialize()
+    Unregistered --> Registered : register(task_id)<br/>copy name + threshold<br/>seed snapshot
+    Registered --> Healthy : start()<br/>sync snapshot<br/>clear miss counter
+    Healthy --> Warning : 1 missed cycle<br/>(grace period)
+    Warning --> Healthy : counter advances
+    Warning --> Timeout : miss count >= threshold
+    Timeout --> Healthy : counter advances again<br/>(re-arms one-shot alarm)
+    Healthy --> Inactive : deactivate()<br/>pauses evaluation
+    Inactive --> Healthy : activate()<br/>re-syncs snapshot
+    Registered --> Unregistered : unregister()
+    Healthy --> Unregistered : unregister()

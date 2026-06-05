@@ -1,0 +1,104 @@
+---
+// Project detail page (case study)
+// One page per entry in the projects collection. Renders the MDX body, which
+// contains the write-up and the Mermaid diagrams for each section.
+
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import BaseLayout from '@layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects', ({ data }) => !data.draft);
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await project.render();
+const { data } = project;
+
+// Format a date as "Month YYYY".
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+}
+---
+
+<BaseLayout title={data.title} description={data.description} ogImage={data.ogImage}>
+  <article class="py-section">
+    <div class="container mx-auto px-4">
+      <!-- Back link -->
+      <a
+        href="/#projects"
+        class="mb-8 inline-flex items-center gap-1 text-sm font-medium text-secondary transition-colors hover:text-primary"
+      >
+        <span aria-hidden="true">&larr;</span> Back to projects
+      </a>
+
+      <!-- Header -->
+      <header class="mb-12 max-w-3xl">
+        <span
+          class="mb-4 inline-block w-fit rounded-md border border-border bg-card px-2 py-0.5 font-mono text-xs uppercase tracking-wide text-secondary"
+        >
+          {data.category}
+        </span>
+        <h1 class="mb-4 text-3xl font-bold text-foreground md:text-4xl">{data.title}</h1>
+        <p class="mb-6 text-lg leading-relaxed text-secondary">{data.description}</p>
+
+        <!-- Tech stack -->
+        <div class="mb-6 flex flex-wrap gap-2">
+          {
+            data.techStack.map((tech) => (
+              <span class="rounded border border-border bg-card px-2.5 py-0.5 text-xs font-medium text-secondary">
+                {tech}
+              </span>
+            ))
+          }
+        </div>
+
+        <!-- Meta + links -->
+        <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-secondary">
+          <span>{formatDate(data.date)}</span>
+          {
+            data.githubUrl && (
+              <a href={data.githubUrl} class="text-primary hover:underline" rel="noopener noreferrer">
+                Source
+              </a>
+            )
+          }
+          {
+            data.liveUrl && (
+              <a href={data.liveUrl} class="text-primary hover:underline" rel="noopener noreferrer">
+                Live
+              </a>
+            )
+          }
+        </div>
+      </header>
+
+      <!-- Optional hero image -->
+      {
+        data.thumbnail && (
+          <div class="mb-12 overflow-hidden rounded-lg border border-border">
+            <Image
+              src={data.thumbnail}
+              alt={data.title}
+              width={1280}
+              height={720}
+              class="w-full"
+              data-no-border
+            />
+          </div>
+        )
+      }
+
+      <!-- MDX body: prose for text, Mermaid components for diagrams -->
+      <div
+        class="prose prose-neutral max-w-3xl dark:prose-invert prose-headings:font-semibold prose-headings:text-foreground prose-p:text-secondary prose-li:text-secondary prose-strong:text-foreground prose-a:text-primary prose-table:text-secondary prose-th:text-foreground"
+      >
+        <Content />
+      </div>
+    </div>
+  </article>
+</BaseLayout>

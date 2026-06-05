@@ -1,0 +1,11 @@
+flowchart LR
+    TIMEOUT["Task enters TIMEOUT state"]
+    BUILD["Build 8-byte diagnostic frame"]
+    QUEUE["Queue frame\n(bounded fault batch)"]
+    LOOP["Finish evaluating\nremaining tasks"]
+    SEND["Transmit queued frames\nSignal system alarm"]
+
+    TIMEOUT --> BUILD --> QUEUE --> LOOP --> SEND
+
+    NOTE["State guard:\nalarm fires exactly once\nper stall episode"]
+    BUILD -.-> NOTE

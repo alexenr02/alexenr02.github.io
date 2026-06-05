@@ -1,0 +1,536 @@
+---
+// Renders a Mermaid diagram on the client.
+// The diagram source is passed as a string (usually imported from a .mmd file
+// with ?raw) so the text can be fine-tuned without touching this component.
+// The single script below finds every diagram on the page, picks light/dark
+// colors from the current theme, and re-renders when the theme is toggled.
+
+interface Props {
+  // Raw Mermaid definition text.
+  code: string;
+  // Small label shown above the diagram (optional).
+  label?: string;
+  // Caption shown below the diagram (optional).
+  caption?: string;
+}
+
+const { code, label, caption } = Astro.props;
+---
+
+<figure class="mermaid-figure">
+  {label && <p class="mermaid-label">{label}</p>}
+  <div class="mermaid-stage">
+    <button type="button" class="mermaid-expand" aria-label="Expand diagram" title="Expand">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 3h6v6"></path>
+        <path d="M9 21H3v-6"></path>
+        <path d="M21 3l-7 7"></path>
+        <path d="M3 21l7-7"></path>
+      </svg>
+    </button>
+    <div
+      class="mermaid-diagram"
+      data-mermaid-src={code}
+      role="img"
+      aria-label={label ?? caption ?? 'Diagram'}
+    >
+    </div>
+  </div>
+  {caption && <figcaption class="mermaid-caption">{caption}</figcaption>}
+</figure>
+
+<style>
+  .mermaid-figure {
+    margin: 0;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .mermaid-label {
+    margin: 0;
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-card-bg);
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-secondary);
+  }
+
+  /* Stage wraps the diagram so the expand button can sit in the corner. */
+  .mermaid-stage {
+    position: relative;
+  }
+
+  /* Expand affordance, top-right of the diagram. */
+  .mermaid-expand {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem;
+    border: 1px solid #d0d0d0;
+    border-radius: 0.35rem;
+    background: rgba(255, 255, 255, 0.9);
+    color: #444444;
+    cursor: zoom-in;
+    opacity: 0;
+    transition:
+      opacity 0.15s ease,
+      color 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  .mermaid-figure:hover .mermaid-expand,
+  .mermaid-expand:focus-visible {
+    opacity: 1;
+  }
+
+  .mermaid-expand:hover {
+    color: #000000;
+    border-color: #000000;
+  }
+
+  /* White canvas in both themes so the black boxes/arrows always show.
+     Horizontal scroll on small screens keeps wide diagrams readable. */
+  .mermaid-diagram {
+    padding: 1.5rem;
+    overflow-x: auto;
+    min-height: 2rem;
+    background: #ffffff;
+    cursor: zoom-in;
+  }
+
+  .mermaid-diagram :global(svg) {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+
+  /* Mermaid SVGs are themed via JS; skip the global dark-mode image border. */
+  .mermaid-diagram :global(svg) {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .mermaid-caption {
+    padding: 0 1rem 1rem;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--color-secondary);
+  }
+</style>
+
+<!-- Global so it applies to the overlay element appended to <body> by the script. -->
+<style is:global>
+  .mermaid-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2vmin;
+    /* Dim + blur the page behind the popup. */
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.18s ease,
+      visibility 0.18s ease;
+  }
+
+  .mermaid-lightbox.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* The popup fills almost the whole viewport so the diagram is large. */
+  .mermaid-lightbox__content {
+    position: relative;
+    display: flex;
+    width: 96vw;
+    height: 94vh;
+    padding: 2.5rem 1.5rem 1.5rem;
+    background: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+    transform: scale(0.94);
+    transition: transform 0.18s ease;
+  }
+
+  .mermaid-lightbox.is-open .mermaid-lightbox__content {
+    transform: scale(1);
+  }
+
+  /* Body holds the diagram; it clips the zoomed content and shows a grab cursor. */
+  .mermaid-lightbox__body {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    cursor: grab;
+  }
+
+  .mermaid-lightbox__body.is-grabbing {
+    cursor: grabbing;
+  }
+
+  /* Scale the diagram up to fill the popup while keeping its aspect ratio.
+     Zoom/pan is applied via inline transform; no transition so it tracks the
+     cursor instantly. */
+  .mermaid-lightbox__body svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    transition: none;
+    user-select: none;
+  }
+
+  .mermaid-lightbox__hint {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.5rem;
+    margin: 0;
+    text-align: center;
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    color: #888888;
+    pointer-events: none;
+  }
+
+  .mermaid-lightbox__close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid #d0d0d0;
+    border-radius: 0.35rem;
+    background: #ffffff;
+    color: #444444;
+    cursor: pointer;
+    line-height: 1;
+    font-size: 1.1rem;
+  }
+
+  .mermaid-lightbox__close:hover {
+    color: #000000;
+    border-color: #000000;
+  }
+
+  /* Respect users who prefer no motion: skip the scale/fade transitions. */
+  @media (prefers-reduced-motion: reduce) {
+    .mermaid-lightbox,
+    .mermaid-lightbox__content {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import mermaid from 'mermaid';
+  import elkLayouts from '@mermaid-js/layout-elk';
+
+  // ELK routes edges as right angles and connects them to the centers of the
+  // box sides, so arrow tips meet boxes head-on. Safe now that renders are
+  // serialized (see the single-flight guard below); the earlier failures were
+  // a render race, not ELK itself.
+  mermaid.registerLayoutLoaders(elkLayouts);
+
+  // High-contrast "blueprint" look: white boxes, black borders/text, black
+  // arrows. The diagrams always render on a white canvas (see the component
+  // styles) so the black connectors stay visible in both light and dark mode.
+  // Colors are easy to revisit later; tweak these values to recolor everything.
+  const diagramVars = {
+    background: '#ffffff',
+    primaryColor: '#ffffff',
+    primaryBorderColor: '#000000',
+    primaryTextColor: '#000000',
+    lineColor: '#000000',
+    secondaryColor: '#ffffff',
+    tertiaryColor: '#ffffff',
+    clusterBkg: '#ffffff',
+    clusterBorder: '#000000',
+    edgeLabelBackground: '#ffffff',
+    nodeTextColor: '#000000',
+    titleColor: '#000000',
+    fontFamily: 'Geist Mono, ui-monospace, monospace',
+    fontSize: '13px',
+  };
+
+  // Serialize rendering: Mermaid mutates the nodes, so two overlapping runs
+  // (e.g. the initial call racing the astro:page-load event) corrupt each other
+  // and Mermaid injects its "Syntax error" graphic. This guard runs one pass at
+  // a time and coalesces any requests that arrive mid-render into a single rerun.
+  let rendering = false;
+  let rerunQueued = false;
+
+  async function renderAll() {
+    if (rendering) {
+      rerunQueued = true;
+      return;
+    }
+    rendering = true;
+    try {
+      await renderDiagrams();
+    } finally {
+      rendering = false;
+      if (rerunQueued) {
+        rerunQueued = false;
+        renderAll();
+      }
+    }
+  }
+
+  // Render (or re-render) every diagram on the page.
+  async function renderDiagrams() {
+    const nodes = Array.from(document.querySelectorAll<HTMLElement>('.mermaid-diagram'));
+    if (nodes.length === 0) return;
+
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'loose',
+      theme: 'base',
+      themeVariables: diagramVars,
+      // ELK orthogonal routing: edges approach boxes perpendicular and land on
+      // the center of a side, so only the arrow tip touches the box.
+      layout: 'elk',
+      elk: {
+        // Keep parallel edges separate (do not bundle them into one line).
+        mergeEdges: false,
+        nodePlacementStrategy: 'NETWORK_SIMPLEX',
+      },
+      flowchart: {
+        // linear draws straight segments along ELK's orthogonal route.
+        curve: 'linear',
+        htmlLabels: true,
+        useMaxWidth: true,
+        nodeSpacing: 80,
+        rankSpacing: 100,
+        padding: 20,
+      },
+      fontFamily: 'Geist Mono, ui-monospace, monospace',
+    });
+
+    // Reset each node back to its raw source before re-running.
+    for (const node of nodes) {
+      const src = node.getAttribute('data-mermaid-src') ?? '';
+      node.removeAttribute('data-processed');
+      node.textContent = src;
+    }
+
+    try {
+      await mermaid.run({ nodes });
+    } catch (err) {
+      const e = err as { message?: string; str?: string };
+      console.error('Mermaid render failed:', e?.message ?? e, e?.str ?? '');
+    }
+  }
+
+  // ---- Click-to-expand lightbox with zoom + pan ---------------------------
+  // One overlay is shared by every diagram on the page. Clicking a diagram (or
+  // its expand button) clones the rendered SVG into a near-fullscreen popup with
+  // a blurred backdrop. Inside, the wheel zooms toward the cursor, dragging pans,
+  // and double-click resets. Close via backdrop, the close button, or Escape.
+  let overlay: HTMLElement | null = null;
+  let bodyEl: HTMLElement | null = null;
+  let svgEl: SVGElement | null = null;
+
+  // Current view transform of the diagram inside the popup.
+  let scale = 1;
+  let panX = 0;
+  let panY = 0;
+  const MIN_SCALE = 1;
+  const MAX_SCALE = 8;
+
+  // Drag (pan) tracking.
+  let dragging = false;
+  let dragStartX = 0;
+  let dragStartY = 0;
+  let panStartX = 0;
+  let panStartY = 0;
+
+  function applyTransform() {
+    if (!svgEl) return;
+    svgEl.style.transformOrigin = '0 0';
+    svgEl.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+  }
+
+  // Keep the scaled diagram from being dragged out of the popup.
+  function clampPan() {
+    if (!bodyEl) return;
+    const w = bodyEl.clientWidth;
+    const h = bodyEl.clientHeight;
+    const minX = Math.min(0, w - scale * w);
+    const minY = Math.min(0, h - scale * h);
+    panX = Math.max(minX, Math.min(0, panX));
+    panY = Math.max(minY, Math.min(0, panY));
+  }
+
+  function resetView() {
+    scale = MIN_SCALE;
+    panX = 0;
+    panY = 0;
+    applyTransform();
+  }
+
+  function ensureOverlay(): HTMLElement {
+    if (overlay) return overlay;
+    overlay = document.createElement('div');
+    overlay.className = 'mermaid-lightbox';
+    overlay.innerHTML =
+      '<div class="mermaid-lightbox__content">' +
+      '<button type="button" class="mermaid-lightbox__close" aria-label="Close">&times;</button>' +
+      '<div class="mermaid-lightbox__body"></div>' +
+      '<p class="mermaid-lightbox__hint">Scroll to zoom, drag to pan, double-click to reset</p>' +
+      '</div>';
+
+    bodyEl = overlay.querySelector('.mermaid-lightbox__body');
+
+    // Close when clicking the backdrop or the close button.
+    overlay.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (target === overlay || target.closest('.mermaid-lightbox__close')) {
+        closeLightbox();
+      }
+    });
+
+    if (bodyEl) {
+      // Wheel: zoom toward the cursor so the point under it stays put.
+      bodyEl.addEventListener(
+        'wheel',
+        (e) => {
+          e.preventDefault();
+          const rect = bodyEl!.getBoundingClientRect();
+          const cx = e.clientX - rect.left;
+          const cy = e.clientY - rect.top;
+          const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+          const next = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale * factor));
+          if (next === scale) return;
+          const k = next / scale;
+          panX = cx - (cx - panX) * k;
+          panY = cy - (cy - panY) * k;
+          scale = next;
+          if (scale === MIN_SCALE) {
+            panX = 0;
+            panY = 0;
+          }
+          clampPan();
+          applyTransform();
+        },
+        { passive: false }
+      );
+
+      // Drag to pan.
+      bodyEl.addEventListener('mousedown', (e) => {
+        dragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        panStartX = panX;
+        panStartY = panY;
+        bodyEl!.classList.add('is-grabbing');
+        e.preventDefault();
+      });
+      window.addEventListener('mousemove', (e) => {
+        if (!dragging) return;
+        panX = panStartX + (e.clientX - dragStartX);
+        panY = panStartY + (e.clientY - dragStartY);
+        clampPan();
+        applyTransform();
+      });
+      window.addEventListener('mouseup', () => {
+        dragging = false;
+        bodyEl?.classList.remove('is-grabbing');
+      });
+
+      // Double-click resets the view.
+      bodyEl.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        resetView();
+      });
+    }
+
+    document.body.appendChild(overlay);
+    return overlay;
+  }
+
+  function openLightbox(svg: SVGElement) {
+    const root = ensureOverlay();
+    if (!bodyEl) return;
+
+    const clone = svg.cloneNode(true) as SVGElement;
+    // Strip Mermaid's fixed size so CSS can scale the clone up to fill the popup.
+    clone.removeAttribute('width');
+    clone.removeAttribute('height');
+    clone.style.maxWidth = 'none';
+    clone.style.maxHeight = 'none';
+    clone.style.width = '100%';
+    clone.style.height = '100%';
+    bodyEl.replaceChildren(clone);
+    svgEl = clone;
+
+    resetView();
+
+    // Force reflow so the transition runs from the initial state.
+    void root.offsetWidth;
+    root.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    if (!overlay) return;
+    overlay.classList.remove('is-open');
+    document.body.style.overflow = '';
+    dragging = false;
+    bodyEl?.classList.remove('is-grabbing');
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeLightbox();
+  });
+
+  // Event delegation so it keeps working after diagrams re-render.
+  document.addEventListener('click', (e) => {
+    const trigger = (e.target as HTMLElement).closest('.mermaid-diagram, .mermaid-expand');
+    if (!trigger) return;
+    const stage = trigger.closest('.mermaid-stage');
+    const svg = stage?.querySelector<SVGElement>('.mermaid-diagram svg');
+    if (svg) openLightbox(svg);
+  });
+
+  // Re-render when the user toggles light/dark.
+  const observer = new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      if (m.attributeName === 'data-theme') {
+        renderAll();
+        break;
+      }
+    }
+  });
+  observer.observe(document.documentElement, { attributes: true });
+
+  // astro:page-load fires on the initial load and after every view-transition
+  // navigation, so a single listener covers first paint and re-paints. Using
+  // only this event (not a bare call) avoids two renders racing on load.
+  document.addEventListener('astro:page-load', renderAll);
+</script>

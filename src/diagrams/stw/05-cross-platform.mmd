@@ -1,0 +1,22 @@
+flowchart TB
+    COMMON["Shared Source\nCore logic identical on both platforms\n(slot model, counter heartbeat, monitoring loop,\ndiagnostic frame, public API, state machine, thresholds table)"]
+
+    COMMON --> MCU1
+    COMMON --> MCU2
+
+    subgraph MCU1["MCU 1 - RTOS A"]
+        A1["Config struct\n(no extra test-stall field)"]
+        A2["Critical section\n(RTOS A primitive)"]
+        A3["Test-stall: block on semaphore\nfor N ticks, then auto-resume"]
+        A4["Atomic write: aligned 32-bit\nvalid on 32-bit core"]
+    end
+
+    subgraph MCU2["MCU 2 - RTOS B"]
+        B1["Config struct\n(includes extra test-stall field\nmacro emits correct initializer)"]
+        B2["Critical section\n(RTOS B primitive)"]
+        B3["Test-stall: suspend task\nvia OS scheduler"]
+        B4["Atomic write: aligned 32-bit\nvalid on 32-bit core"]
+    end
+
+    NOTE["Both test-stall paths excluded\nfrom production builds"]
+    A3 & B3 -.-> NOTE

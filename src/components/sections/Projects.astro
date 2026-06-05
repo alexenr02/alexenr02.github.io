@@ -1,0 +1,94 @@
+---
+// Projects section
+// Reads from src/content/projects/ and renders a grid of project cards.
+// Each card links to the project's detail page at /projects/<slug>.
+
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+
+const all = await getCollection('projects', ({ data }) => !data.draft && !data.archived);
+
+// Lower order first; entries without order fall to the back. Tie-break by date.
+const projects = all.sort((a, b) => {
+  const orderDiff = (a.data.order ?? 99) - (b.data.order ?? 99);
+  if (orderDiff !== 0) return orderDiff;
+  return b.data.date.getTime() - a.data.date.getTime();
+});
+---
+
+<section id="projects" class="scroll-mt-20 bg-card py-section">
+  <div class="container mx-auto px-4">
+    <h2 class="mb-12 text-3xl font-bold text-foreground md:text-4xl">Projects</h2>
+
+    {
+      projects.length === 0 ? (
+        <p class="text-lg text-secondary">Projects coming soon.</p>
+      ) : (
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {projects.map((project) => (
+            <a
+              href={`/projects/${project.slug}`}
+              class="group flex flex-col overflow-hidden rounded-lg border border-border bg-background transition-colors hover:border-primary/50"
+            >
+              {/* Cover: real thumbnail when present, otherwise a styled fallback. */}
+              {project.data.thumbnail ? (
+                <div class="aspect-video overflow-hidden border-b border-border">
+                  <Image
+                    src={project.data.thumbnail}
+                    alt={project.data.title}
+                    width={640}
+                    height={360}
+                    class="h-full w-full object-cover"
+                    data-no-border
+                  />
+                </div>
+              ) : (
+                <div class="flex aspect-video items-center justify-center border-b border-border bg-gradient-to-br from-primary/10 to-accent/10 p-6">
+                  <span class="text-center font-mono text-sm font-semibold tracking-tight text-foreground">
+                    {project.data.title}
+                  </span>
+                </div>
+              )}
+
+              <div class="flex flex-1 flex-col p-5">
+                {/* Category badge */}
+                <span class="mb-3 w-fit rounded-md border border-border bg-card px-2 py-0.5 font-mono text-xs uppercase tracking-wide text-secondary">
+                  {project.data.category}
+                </span>
+
+                <h3 class="mb-2 text-lg font-semibold text-foreground group-hover:text-primary">
+                  {project.data.title}
+                </h3>
+
+                <p class="mb-4 flex-1 text-sm leading-relaxed text-secondary">
+                  {project.data.description}
+                </p>
+
+                {/* Tech tags */}
+                <div class="mb-4 flex flex-wrap gap-1.5">
+                  {project.data.techStack.slice(0, 4).map((tech) => (
+                    <span class="rounded border border-border bg-card px-2 py-0.5 text-xs text-secondary">
+                      {tech}
+                    </span>
+                  ))}
+                  {project.data.techStack.length > 4 && (
+                    <span class="px-1 py-0.5 text-xs text-secondary">
+                      +{project.data.techStack.length - 4}
+                    </span>
+                  )}
+                </div>
+
+                <span class="mt-auto inline-flex items-center gap-1 text-sm font-medium text-primary">
+                  View case study
+                  <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">
+                    &rarr;
+                  </span>
+                </span>
+              </div>
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</section>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Software Thread Watchdog — Technical Diagrams</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.1/mermaid.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #0d0f12;
+      --surface:   #13161b;
+      --border:    #1e2530;
+      --accent:    #00c2a8;
+      --accent2:   #4f8ef7;
+      --warn:      #f5a623;
+      --text:      #c9d1dc;
+      --text-dim:  #5a6476;
+      --heading:   #eaf0fb;
+      --mono:      'IBM Plex Mono', monospace;
+      --sans:      'IBM Plex Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-weight: 300;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 3rem 2rem 2.5rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    h1 {
+      font-family: var(--mono);
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 600;
+      color: var(--heading);
+      letter-spacing: -0.01em;
+      line-height: 1.25;
+    }
+
+    .subtitle {
+      margin-top: 0.6rem;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      font-weight: 300;
+    }
+
+    /* ── Nav pills ── */
+    nav {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav a {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      padding: 0.3rem 0.75rem;
+      border-radius: 2px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    nav a:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* ── Main layout ── */
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 2rem 4rem;
+    }
+
+    /* ── Section card ── */
+    .section {
+      margin-top: 3.5rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeUp 0.4s ease forwards;
+    }
+
+    .section:nth-child(1) { animation-delay: 0.05s; }
+    .section:nth-child(2) { animation-delay: 0.12s; }
+    .section:nth-child(3) { animation-delay: 0.19s; }
+    .section:nth-child(4) { animation-delay: 0.26s; }
+    .section:nth-child(5) { animation-delay: 0.33s; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: none; }
+    }
+
+    .section-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1.1rem 1.5rem;
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+    }
+
+    .section-num {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--heading);
+    }
+
+    .section-desc {
+      padding: 1rem 1.5rem 0;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      font-style: italic;
+      border-top: none;
+    }
+
+    /* ── Diagram wrapper ── */
+    .diagram-wrap {
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+
+    .diagram-wrap + .diagram-wrap {
+      border-top: 1px solid var(--border);
+    }
+
+    .diagram-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 1rem;
+    }
+
+    /* Force Mermaid SVG to inherit theme colors */
+    .mermaid svg {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    /* ── Back link ── */
+    footer {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 2rem 3rem;
+      border-top: 1px solid var(--border);
+    }
+
+    footer a {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+    }
+
+    footer a:hover { color: var(--accent); }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      header, nav, main, footer { padding-left: 1rem; padding-right: 1rem; }
+      .section-header { flex-direction: column; gap: 0.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <p class="label">Portfolio / Embedded Systems</p>
+  <h1>Software Thread Watchdog<br>Technical Diagrams</h1>
+  <p class="subtitle">APX Platform &mdash; Carrier Transicold &mdash; ARM Cortex-M4/M7 &middot; embOS &middot; MQX &middot; ISO&nbsp;26262 ASIL-B</p>
+</header>
+
+<nav>
+  <a href="#s1">§1 Problem Statement</a>
+  <a href="#s2">§2 Design Evolution</a>
+  <a href="#s3">§3 Architecture</a>
+  <a href="#s4">§4 CAN Reporting</a>
+  <a href="#s5">§5 Cross-Platform</a>
+</nav>
+
+<main>
+
+  <!-- §1 -->
+  <div class="section" id="s1">
+    <div class="section-header">
+      <span class="section-num">§ 01</span>
+      <span class="section-title">Problem Statement</span>
+    </div>
+    <p class="section-desc">Why a hardware watchdog alone is not enough.</p>
+    <div class="diagram-wrap">
+      <div class="mermaid">
+%%{init: {"theme": "dark", "flowchart": {"curve": "stepBefore"}} }%%
+flowchart TD
+    HW["Hardware Watchdog\n(board-level timer)"]
+    SERV["Servicing context\nstill running"]
+    HW -- "timer serviced - no reset" --> SERV
+
+    SERV --> S1["Single-task starvation\nHigh-priority task spins;\nlow-priority task never scheduled"]
+    SERV --> S2["Deadlock / priority inversion\nSubset of tasks stall on\nshared resource"]
+    SERV --> S3["Silent logical hang\nTask stays ready but stuck\nin loop or unreachable event"]
+    SERV --> S4["No diagnosability\nReset discards context;\nwhich subsystem failed is unknown"]
+
+    S1 & S2 & S3 & S4 --> STW
+
+    STW["Software Thread Watchdog\nMonitors each task individually\nfor forward progress"]
+    STW --> D["CAN diagnostic frame\nnames the specific stalled task\nbefore system-level recovery"]
+    STW --> HW2["Hardware watchdog\nremains last line of defense"]
+      </div>
+    </div>
+  </div>
+
+  <!-- §2 -->
+  <div class="section" id="s2">
+    <div class="section-header">
+      <span class="section-num">§ 02</span>
+      <span class="section-title">Design Evolution: Timestamp to Counter</span>
+    </div>
+    <p class="section-desc">Why the first approach was scrapped and what replaced it.</p>
+    <div class="diagram-wrap">
+      <div class="mermaid">
+%%{init: {"theme": "dark", "flowchart": {"curve": "stepBefore"}} }%%
+flowchart LR
+    subgraph V1["Approach 1 — Timestamps (discarded)"]
+        direction TB
+        T1["Task loop iteration"]
+        T2["Read current wall-clock time\n(multi-step, shared source)"]
+        T3["Enter critical section"]
+        T4["Write timestamp\n(multi-byte value)"]
+        T5["Exit critical section"]
+        T1 --> T2 --> T3 --> T4 --> T5
+
+        P1["Problems"]
+        P1 --> PA["Critical section in hot path\nscheduling jitter and contention"]
+        P1 --> PB["False alarms from clock\nwraparound / tick resolution"]
+        P1 --> PC["Shared time service coupling\nadds stack depth and reentrancy risk"]
+    end
+
+    subgraph V2["Approach 2 — Monotonic Counters (adopted)"]
+        direction TB
+        C1["Task loop iteration"]
+        C2["task_counter[id]++\n(volatile 32-bit, lock-free)"]
+        C1 --> C2
+
+        M1["Monitor (once per cycle)"]
+        M2{"counter !=\nlast_snapshot?"}
+        M3["Update snapshot\nReset miss count\nMark HEALTHY"]
+        M4["Increment miss count"]
+        M1 --> M2
+        M2 -- Yes --> M3
+        M2 -- No --> M4
+
+        R1["Benefits"]
+        R1 --> RA["No lock in heartbeat path\naligned 32-bit write is atomic"]
+        R1 --> RB["No shared clock — detects\nchange, not elapsed time"]
+        R1 --> RC["One memory write per iteration\nno call into time service"]
+    end
+
+    V1 -- "replaced by" --> V2
+      </div>
+    </div>
+  </div>
+
+  <!-- §3 -->
+  <div class="section" id="s3">
+    <div class="section-header">
+      <span class="section-num">§ 03</span>
+      <span class="section-title">Architecture</span>
+    </div>
+    <p class="section-desc">Slot model, task lifecycle, and monitoring loop.</p>
+    <div class="diagram-wrap">
+      <p class="diagram-label">Task slot state machine</p>
+      <div class="mermaid">
+%%{init: {"theme": "dark"} }%%
+stateDiagram-v2
+    [*] --> Unregistered : initialize()
+    Unregistered --> Registered : register(task_id)\nCopies name + threshold\nSeeds snapshot
+    Registered --> Healthy : start()\nSyncs snapshot\nClears miss counter
+    Healthy --> Warning : 1 missed cycle\n(grace period)
+    Warning --> Healthy : counter advances
+    Warning --> Timeout : miss count >= threshold
+    Timeout --> Healthy : counter advances again\n(re-arms one-shot alarm)
+    Healthy --> Inactive : deactivate()\nPauses evaluation
+    Inactive --> Healthy : activate()\nRe-syncs snapshot
+    Registered --> Unregistered : unregister()
+    Healthy --> Unregistered : unregister()
+      </div>
+    </div>
+    <div class="diagram-wrap">
+      <p class="diagram-label">Slot model and data flow</p>
+      <div class="mermaid">
+%%{init: {"theme": "dark", "flowchart": {"curve": "stepBefore"}} }%%
+flowchart TD
+    subgraph Slot["Slot (one per task)"]
+        ID["Task ID"]
+        NAME["ASCII short name"]
+        CTR["live progress counter\n(volatile uint32)"]
+        SNAP["monitor's last snapshot"]
+        MISS["consecutive-miss counter"]
+        THR["per-task miss threshold"]
+        FLAGS["active / registered flags"]
+        STATE["health state"]
+    end
+
+    TASK["Monitored Task"] -- "counter++\n(lock-free)" --> CTR
+    MONITOR["Monitor Task\n(1 Hz cycle)"] -- "reads" --> CTR
+    MONITOR -- "updates" --> SNAP
+    MONITOR -- "updates" --> MISS
+    MONITOR -- "updates" --> STATE
+    STATE -- "Timeout" --> CAN["CAN diagnostic frame\n(queued, sent after loop)"]
+      </div>
+    </div>
+  </div>
+
+  <!-- §4 -->
+  <div class="section" id="s4">
+    <div class="section-header">
+      <span class="section-num">§ 04</span>
+      <span class="section-title">CAN Diagnostic Reporting</span>
+    </div>
+    <p class="section-desc">Frame layout and fault reporting flow.</p>
+    <div class="diagram-wrap">
+      <p class="diagram-label">8-byte diagnostic frame layout</p>
+      <div class="mermaid">
+%%{init: {"theme": "dark"} }%%
+packet-beta
+  0-7: "Task ID"
+  8-15: "ASCII name[0]"
+  16-23: "ASCII name[1]"
+  24-31: "Missed count"
+  32-39: "Threshold"
+  40-47: "Registered task count"
+  48-55: "Marker 0xAA"
+  56-63: "Marker 0x55"
+      </div>
+    </div>
+    <div class="diagram-wrap">
+      <p class="diagram-label">Fault reporting flow</p>
+      <div class="mermaid">
+%%{init: {"theme": "dark", "flowchart": {"curve": "stepBefore"}} }%%
+flowchart LR
+    TIMEOUT["Task enters TIMEOUT state"]
+    BUILD["Build 8-byte diagnostic frame"]
+    QUEUE["Queue frame\n(bounded fault batch)"]
+    LOOP["Finish evaluating\nremaining tasks"]
+    SEND["Transmit queued frames\nSignal system alarm"]
+
+    TIMEOUT --> BUILD --> QUEUE --> LOOP --> SEND
+
+    NOTE["State guard:\nalarm fires exactly once\nper stall episode"]
+    BUILD -.-> NOTE
+      </div>
+    </div>
+  </div>
+
+  <!-- §5 -->
+  <div class="section" id="s5">
+    <div class="section-header">
+      <span class="section-num">§ 05</span>
+      <span class="section-title">Cross-Platform Notes</span>
+    </div>
+    <p class="section-desc">One shared source base running on two MCUs with two different RTOSes.</p>
+    <div class="diagram-wrap">
+      <div class="mermaid">
+%%{init: {"theme": "dark", "flowchart": {"curve": "stepBefore"}} }%%
+flowchart TB
+    COMMON["Shared Source\nCore logic identical on both platforms\n(slot model, counter heartbeat, monitoring loop,\ndiagnostic frame, public API, state machine, thresholds table)"]
+
+    COMMON --> MCU1
+    COMMON --> MCU2
+
+    subgraph MCU1["MCU 1 — RTOS A"]
+        A1["Config struct\n(no extra test-stall field)"]
+        A2["Critical section\n(RTOS A primitive)"]
+        A3["Test-stall: block on semaphore\nfor N ticks, then auto-resume"]
+        A4["Atomic write: aligned 32-bit\nvalid on 32-bit core"]
+    end
+
+    subgraph MCU2["MCU 2 — RTOS B"]
+        B1["Config struct\n(includes extra test-stall field\nmacro emits correct initializer)"]
+        B2["Critical section\n(RTOS B primitive)"]
+        B3["Test-stall: suspend task\nvia OS scheduler"]
+        B4["Atomic write: aligned 32-bit\nvalid on 32-bit core"]
+    end
+
+    NOTE["Both test-stall paths excluded\nfrom production builds"]
+    A3 & B3 -.-> NOTE
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <a href="index.html">← Back to portfolio</a>
+</footer>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      darkMode: true,
+      background:       '#0d0f12',
+      primaryColor:     '#1a2535',
+      primaryBorderColor: '#2e3d52',
+      primaryTextColor: '#c9d1dc',
+      lineColor:        '#4f8ef7',
+      secondaryColor:   '#13161b',
+      tertiaryColor:    '#13161b',
+      edgeLabelBackground: '#13161b',
+      fontFamily:       'IBM Plex Mono, monospace',
+      fontSize:         '13px',
+    },
+    flowchart: { curve: 'stepBefore', htmlLabels: true },
+  });
+</script>
+
+</body>
+</html>
