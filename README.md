@@ -9,7 +9,7 @@ before the testbench exists, redesigning a watchdog because v1 was throwing
 false alarms, and walking the production line to figure out why a board that
 worked yesterday is suddenly bricking units today.
 
-A lot of my work happens in safety-critical CAN-based systems for industrial,
+A lot of my work happens in CAN-based systems for industrial,
 automotive, and refrigeration platforms — but really, the domain matters less
 to me than the chance to take a problem from "the prototype arrived dead in a
 shipping container" to "it ships on Monday."
