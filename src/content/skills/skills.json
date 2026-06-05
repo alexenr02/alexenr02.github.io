@@ -3,19 +3,37 @@
   "groups": [
     {
       "category": "Languages",
-      "skills": ["Embedded C", "C++", "Python", "PowerShell"]
+      "skills": [
+        "Embedded C",
+        "C++",
+        "Python",
+        "PowerShell"
+      ]
     },
     {
       "category": "Microcontrollers",
-      "skills": ["ARM Cortex-M4", "ARM Cortex-M7"]
+      "skills": [
+        "ARM Cortex-M4",
+        "ARM Cortex-M7"
+      ]
     },
     {
       "category": "RTOS",
-      "skills": ["embOS", "MQX"]
+      "skills": [
+        "embOS",
+        "MQX",
+        "FreeRTOS"
+      ]
     },
     {
       "category": "Communication & Interfaces",
-      "skills": ["CAN", "J1939", "BLE", "UART", "RS-232"]
+      "skills": [
+        "CAN",
+        "J1939",
+        "BLE",
+        "UART",
+        "RS-232"
+      ]
     },
     {
       "category": "Tools",
@@ -28,7 +46,10 @@
         "GCC",
         "IBM Rhapsody",
         "Polarion",
-        "IBM Jazz/RTC"
+        "IBM Jazz/RTC",
+        "Jira",
+        "GitHub",
+        "Bitbucket"
       ]
     },
     {
