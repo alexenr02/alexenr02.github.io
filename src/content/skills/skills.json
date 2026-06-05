@@ -15,7 +15,8 @@
       "skills": [
         "ARM Cortex-M4",
         "ARM Cortex-M7",
-        "PIC"
+        "PIC18",
+        "PIC32"
       ]
     },
     {
