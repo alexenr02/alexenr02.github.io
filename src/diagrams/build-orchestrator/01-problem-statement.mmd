@@ -1,0 +1,24 @@
+flowchart LR
+    subgraph OLD["Manual release (per family, every time)"]
+        direction TB
+        O1["Open each module's project\nin build_tool / ide_tool one at a time"]
+        O2["Pick the right configuration\n(SQA / Field Trial / Production)"]
+        O3["Trigger each compile and wait,\nwatching for silent failures"]
+        O4["Hunt for each .hex artifact\nand copy it into Build/"]
+        O5["Hand-edit Build_VersionNumber\nin the populate .bat"]
+        O6["Run the populate script\nand answer its prompts"]
+        O7["Create release folder by hand,\nwrite the changelog"]
+        O1 --> O2 --> O3 --> O4 --> O5 --> O6 --> O7
+    end
+
+    subgraph NEW["Single command"]
+        direction TB
+        N1["python build.py"]
+        N2["Pick family + maturity once\nfrom the interactive menu"]
+        N3["Parallel command-line builds\n+ sequential IDE builds"]
+        N4["Artifacts auto-copied,\nversion auto-synced, packaged"]
+        N5["Timestamped release folder\n+ generated ChangeLog.txt"]
+        N1 --> N2 --> N3 --> N4 --> N5
+    end
+
+    OLD -- "replaced by" --> NEW

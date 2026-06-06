@@ -1,0 +1,19 @@
+flowchart TD
+    SCAN["Scan workspace index\n+ detect family availability"]
+    SCAN --> FAMQ{"Pick a software family"}
+
+    FAMQ -- "C" --> CLEAN["Clean menu\n(old builds, staged hex, logs)\nconfirm each delete"]
+    CLEAN --> FAMQ
+
+    FAMQ -- "0 (build all)" --> MAT
+    FAMQ -- "single family" --> MAT
+
+    MAT{"Pick a maturity\nSQA / Field Trial / Production"}
+    MAT --> SINGLE{"Single family?"}
+
+    SINGLE -- "No (build all)" --> ALL["build_all_families()\nbuild every available family\nin sequence, then rollup"]
+    SINGLE -- "Yes" --> SCOPE{"Module scope"}
+
+    SCOPE -- "All modules" --> RUN["build_family()"]
+    SCOPE -- "Cherry-pick" --> PICK["Pick modules by number;\nunselected reuse staged .hex"]
+    PICK --> RUN

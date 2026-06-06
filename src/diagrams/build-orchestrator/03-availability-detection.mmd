@@ -1,0 +1,18 @@
+flowchart TD
+    START["For each family in the matrix"]
+
+    START --> WS{"Workspace dir + project file\npresent for every project?"}
+    WS -- "No" --> MP["Record missing projects"]
+    WS -- "Yes" --> TOOL
+
+    MP --> TOOL{"Every required tool\nresolvable via env var\nor fallback path?"}
+    TOOL -- "No" --> MT["Record missing tools"]
+    TOOL -- "Yes" --> BAT
+
+    MT --> BAT{"Populate .bat\ndefined and present?"}
+    BAT -- "No" --> MS["Record missing script"]
+    BAT -- "Yes" --> EVAL
+
+    MS --> EVAL{"Anything missing?"}
+    EVAL -- "No" --> OK["Listed as buildable\nin the menu"]
+    EVAL -- "Yes" --> NA["Shown as NOT AVAILABLE\nwith the reason(s)"]

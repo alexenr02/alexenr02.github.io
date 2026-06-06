@@ -340,7 +340,20 @@ const { code, label, caption } = Astro.props;
     }
 
     try {
-      await mermaid.run({ nodes });
+      // Render one diagram at a time so a syntax error in one does not
+      // leave every diagram on the page blank.
+      for (const node of nodes) {
+        try {
+          await mermaid.run({ nodes: [node] });
+        } catch (err) {
+          const e = err as { message?: string; str?: string };
+          console.error(
+            'Mermaid render failed for one diagram:',
+            e?.message ?? e,
+            e?.str ?? ''
+          );
+        }
+      }
     } catch (err) {
       const e = err as { message?: string; str?: string };
       console.error('Mermaid render failed:', e?.message ?? e, e?.str ?? '');

@@ -1,0 +1,15 @@
+flowchart TD
+    JSON["project_matrix.json\n(single source of truth)"]
+
+    JSON --> MAT["maturities\noption + label for\nSQA / Field Trial / Production"]
+    JSON --> TOOLS["tools\nenv_var, relative_exe, fallback_exe\n(locate each compiler)"]
+    JSON --> FAM["families"]
+
+    FAM --> F1["family entry\nmenu_option, label, code,\nbat_script (populate)"]
+    F1 --> PROJ["projects list"]
+
+    PROJ --> P1["project\nname, workspace, project file, tool"]
+    P1 --> BM["build_modes\n(one per maturity)"]
+    BM --> BMD["configuration + artifact .hex\nper SQA / Field Trial / Production"]
+
+    TOOLS -. "tool name referenced by" .-> P1

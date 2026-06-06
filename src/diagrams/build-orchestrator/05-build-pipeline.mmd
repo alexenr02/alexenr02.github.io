@@ -1,0 +1,17 @@
+flowchart LR
+    SELECT["Selected modules\nfor one family + maturity"]
+
+    SELECT --> SPLIT{"Tool type\nper project"}
+
+    SPLIT -- "command-line tool" --> POOL["ThreadPoolExecutor\nbuild command-line projects\nin parallel"]
+    SPLIT -- "IDE tool" --> SEQ["Build IDE projects\nsequentially (headless)"]
+    SELECT -- "not selected" --> STAGE["Reuse existing .hex\nalready staged in Build/"]
+
+    POOL --> HB["run_with_heartbeat\nstream log + still running lines"]
+    SEQ --> HB
+
+    HB --> COPY["On success: copy artifact\n.hex into Build/"]
+    COPY --> COLLECT["Collect per-project results"]
+    STAGE --> COLLECT
+
+    POOL -. "any build fails" .-> ABORT["Cancel pending builds\nmark family FAILED"]

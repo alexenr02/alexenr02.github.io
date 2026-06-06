@@ -1,0 +1,11 @@
+flowchart TD
+    SYNC["Read CODE_BUILD_VERSION\nfrom common_version.c"]
+    SYNC --> WRITE["Rewrite Build_VersionNumber\nin the populate .bat"]
+    WRITE --> FOLDER["Create output folder\nCODE_Maturity_version"]
+
+    FOLDER --> POP["Run Populate_*.bat via cmd.exe\nprompts suppressed, hex staged in"]
+    POP --> CLEAN["Remove temp .hex / .exe\nfrom the output folder"]
+    CLEAN --> LOG["Generate ChangeLog.txt\n(family, maturity, version, date)"]
+
+    GIT["git log -10\n(optional, skipped if unavailable)"] -. "recent commits" .-> LOG
+    LOG --> DONE["Release folder + ChangeLog.txt ready;\nper-project logs under Build/logs/"]

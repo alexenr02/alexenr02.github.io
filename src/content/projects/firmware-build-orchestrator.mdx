@@ -1,0 +1,179 @@
+---
+title: "Firmware Build Orchestrator"
+description: "A data-driven, single-command build tool that compiles multi-family embedded firmware across two toolchains, syncs the version, packages the artifacts, and drops a timestamped release folder with a generated changelog."
+category: "Software"
+techStack:
+  - "Python 3.10+"
+  - "ThreadPoolExecutor"
+  - "subprocess"
+  - "Windows / cmd.exe"
+  - "Git"
+  - "PowerShell"
+  - "Textual"
+
+tags:
+  - "Automation"
+  - "Tooling"
+  - "Embedded"
+thumbnail: "./fbo-cover.png"
+date: 2026-04-25
+featured: true
+order: 2
+---
+
+import Mermaid from "@components/common/Mermaid.astro";
+import problemStatement from "../../diagrams/build-orchestrator/01-problem-statement.mmd?raw";
+import configModel from "../../diagrams/build-orchestrator/02-config-model.mmd?raw";
+import availabilityDetection from "../../diagrams/build-orchestrator/03-availability-detection.mmd?raw";
+import menuFlow from "../../diagrams/build-orchestrator/04-menu-flow.mmd?raw";
+import buildPipeline from "../../diagrams/build-orchestrator/05-build-pipeline.mmd?raw";
+import versionPackaging from "../../diagrams/build-orchestrator/06-version-packaging.mmd?raw";
+
+## 1. Problem Statement
+
+Embedded firmware for multiple product families is rarely a single build. Each
+family is spread across several IDE workspaces, each with its own toolchain (a
+command-line compiler for some modules, an Eclipse-based IDE for others), its own
+build configurations (SQA / Field Trial / Production), and a separate packaging
+step that stamps a version number and bundles the resulting '.hex' files.
+
+Doing this by hand for every release is slow and error-prone. An engineer has to
+open each project, pick the right configuration, wait for the compile while
+watching for silent failures, copy each artifact, hand-edit a version string in a
+'.bat' file, run the packaging script and answer its prompts, then assemble a
+release folder and write a changelog. The sequence repeats for every product
+family, and any skipped step ships the wrong bits.
+
+This script replaces that whole sequence with one interactive menu. It reads a
+JSON matrix describing every family, project, and tool; detects which families
+can build on the current machine; compiles command-line projects in parallel
+while running IDE projects sequentially; syncs the build version from
+'common_version.c'; packages the output; and drops a timestamped release folder
+with a generated 'ChangeLog.txt'
+
+<Mermaid
+  code={problemStatement}
+  caption="The manual per-release sequence on the left collapses into a single command on the right."
+/>
+
+## 2. Data-Driven Configuration
+
+The script does not hardcode any families. Everything it knows about the products
+lives in 'project_matrix.json', so adding a new family or a new module is a data
+edit, not a code change. The matrix has three top-level sections:
+
+- **'maturities'** map each menu option to a label: 'SQA', 'Field Trial', and
+  'Production'. These are the build types the user picks once per run.
+- **'tools'** define how to locate each compiler. Every tool entry carries an
+  'env_var', a 'relative_exe', and a 'fallback_exe', so the executable is found
+  either through an environment variable or a default install path.
+- **'families'** each carry a 'menu_option', a 'label', a short 'code' used in the
+  output folder name, an optional populate 'bat_script', and a list of
+  'projects'. Each project names its 'workspace', 'project' file, and 'tool', plus
+  a 'build_modes' map giving the 'configuration' and output 'artifact' for every
+  maturity.
+
+Keeping the configuration in one validated file means the thresholds, paths, and
+per-maturity outputs are reviewable in a single place, and the loader rejects a
+matrix that is missing required fields or defines duplicate menu options.
+
+<Mermaid
+  code={configModel}
+  label="project_matrix.json structure"
+  caption="One JSON file describes every maturity, tool, family, project, and per-maturity build mode."
+/>
+
+## 3. Availability Detection
+
+A clean checkout, or a machine that only has some of the toolchains installed,
+should not present build options it cannot honor. Before drawing the menu, the
+script walks every family in the matrix and checks four things: the workspace
+directory exists, each project file is present, every tool the family needs is
+resolvable (via its env var or fallback path), and the populate script is
+defined and on disk.
+
+A family that passes all four checks is listed as buildable. A family that fails
+any of them is shown as '[NOT AVAILABLE]' with the specific reason, for example
+'missing tools: ide_tool' or 'missing projects: proda_display'. The detection is
+also why the example matrix is useful on a fresh clone: it points at placeholder
+workspaces and tools that do not exist, so both families show up as not
+available, demonstrating the check rather than erroring out.
+
+<Mermaid
+  code={availabilityDetection}
+  label="Per-family availability checks"
+  caption="Each family must pass all four checks to be offered; otherwise it is listed with the missing pieces."
+/>
+
+## 4. Interactive Menu
+
+The menu is the single entry point. It first prints a one-line workspace summary,
+then lists the families (buildable ones plain, unavailable ones annotated), a
+build-all option when more than one family is available, and a clean option that
+is always offered even when nothing can be built.
+
+The flow is: pick a family (or build-all), pick a maturity, and for a single
+family, choose whether to build all modules or cherry-pick a subset by number.
+Cherry-picking is the fast path for iterating on one module: the selected modules
+are compiled fresh and every unselected module reuses the '.hex' already staged
+in 'Build/', so a one-module change does not pay for a full family rebuild. The
+clean option loops back to the menu rather than starting a build, so housekeeping
+and building never get tangled.
+
+<Mermaid
+  code={menuFlow}
+  label="Menu to selection flow"
+  caption="The menu resolves to a single-family build, a cherry-picked subset, or a build-all run; cleaning loops back to the menu."
+/>
+
+## 5. Build Pipeline
+
+Once the selection is made, the projects are split by tool type. Command-line
+compiler projects are independent and CPU-bound, so they run in parallel through
+a 'ThreadPoolExecutor' sized to the smaller of the project count and the CPU
+count. IDE (Eclipse headless) projects are run sequentially, because they are
+heavier and do not share well. Any module the user did not select is not built at
+all; its previously staged '.hex' is reused.
+
+Each compile runs under a heartbeat wrapper: a background thread streams the
+tool's output into a per-project log file while the main thread waits with a
+timeout and prints a periodic "still running" line, so a long compile never looks
+like a hang. On success the expected artifact '.hex' is copied into 'Build/'. If
+any parallel build raises, the remaining pending builds are cancelled and the
+family is marked 'FAILED', so a broken module fails fast instead of wasting time
+on the rest.
+
+<Mermaid
+  code={buildPipeline}
+  label="Parallel and sequential build scheduling"
+  caption="Command-line projects build in parallel, IDE projects sequentially, and unselected modules reuse their staged hex."
+/>
+
+## 6. Version Sync, Packaging, and Changelog
+
+The version number is never typed by hand. The script reads
+`CODE_BUILD_VERSION` (the family code plus `_BUILD_VERSION`, e.g. `PRODA_BUILD_VERSION`)
+from `common_version.c`, formats it into a six-digit string, and rewrites the
+`Build_VersionNumber` line inside the family's populate `.bat`. That keeps the
+packaged firmware version and the release folder name in lockstep with the source
+of truth in the codebase.
+
+The output folder is named with the pattern `CODE_Maturity_version` (e.g.
+`PRODA_Production_01.02.03`) and the populate script runs inside it through
+`cmd.exe`, with its interactive "press any key" prompt commented out so a
+headless run never blocks. After packaging, temporary `.hex` and `.exe` files are
+cleaned out of the output folder, and a `ChangeLog.txt` is generated with the
+family, maturity, version, timestamp, and the last ten git commits. Git is
+optional: if it is not on `PATH`, the changelog is still produced with a note in
+place of the commit list. Per-project logs are written under `Build/logs/` in a
+per-family subdirectory for after-the-fact inspection.
+
+The build-all option simply repeats this whole pipeline for each available family
+in sequence. It keeps going after a family fails, then prints a rollup summary so
+one bad family does not abort the rest of the release.
+
+<Mermaid
+  code={versionPackaging}
+  label="Version sync to release folder"
+  caption="The version is synced from source, the populate script is run headless, and a changelog is generated to finish the release folder."
+/>
