@@ -3,8 +3,9 @@
 // All editable copy lives in src/content/about/about.json
 
 import about from '../../content/about/about.json';
-import hero from '../../content/hero/hero.json';
 import { Download } from 'lucide-svelte';
+
+const aboutPhoto = about.photo?.trim() || undefined;
 ---
 
 <section id="about" class="scroll-mt-[var(--nav-height)] py-section">
@@ -15,21 +16,20 @@ import { Download } from 'lucide-svelte';
       <!-- Photo Column -->
       <div class="flex flex-col items-center md:items-start">
         <div
-          class="relative mb-6 h-64 w-64 overflow-hidden rounded-lg border-2 border-border bg-card shadow-lg md:h-80 md:w-80"
+          class="relative mb-6 h-64 w-64 overflow-hidden rounded-lg border-2 border-dashed border-border bg-card shadow-lg md:h-80 md:w-80"
+          aria-label={aboutPhoto ? undefined : 'Photo placeholder'}
         >
           {
-            hero.workspaceImage ? (
+            aboutPhoto ? (
               <img
-                src={hero.workspaceImage}
-                alt={hero.workspaceImageAlt}
+                src={aboutPhoto}
+                alt={about.photoAlt || 'About photo'}
                 class="h-full w-full object-cover"
                 loading="lazy"
                 decoding="async"
               />
             ) : (
-              <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5 text-4xl font-bold text-primary">
-                AE
-              </div>
+              <div class="h-full w-full bg-card" aria-hidden="true"></div>
             )
           }
         </div>

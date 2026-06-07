@@ -92,6 +92,13 @@ collections:
         format: json
         fields:
           - { name: sectionTitle, label: Section Title, widget: string }
+          - name: photo
+            label: Photo
+            widget: image
+            required: false
+            media_folder: public/images/about
+            public_folder: /images/about
+          - { name: photoAlt, label: Photo Alt Text, widget: string, required: false }
           - { name: subheading, label: Subheading, widget: string }
           - name: paragraphs
             label: Paragraphs

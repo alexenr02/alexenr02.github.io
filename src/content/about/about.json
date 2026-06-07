@@ -1,5 +1,7 @@
 {
   "sectionTitle": "About Me",
+  "photo": "",
+  "photoAlt": "",
   "subheading": "Firmware & Embedded Software Engineer",
   "paragraphs": [
     "Embedded Software Engineer with 4 years developing firmware on CAN-based multi-ECU architectures. Proven ability to own problems end-to-end, from hardware bring-up to manufacturing support.",

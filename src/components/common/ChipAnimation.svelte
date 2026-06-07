@@ -10,6 +10,7 @@
    * DISPLAY (how big / where on screen)
    * - VIEWBOX: smaller `w`/`h` zooms in; adjust `x`/`y` to pan (move chip right = decrease `x`)
    * - SVG panel width: Tailwind classes on `.chip-animation__svg` (w-[…], max-w-…)
+   * - --mobile-scale: narrow-screen zoom (CSS on `.chip-animation`, default 1.85)
    *
    * GEOMETRY (chip + PCB in isometric units)
    * - CHIP_W / CHIP_D: footprint and die layer size
@@ -21,8 +22,12 @@
    * - SEPARATION_PX: how far each layer rises at progress = 1
    * - STAGGER: delay between layers (0–1 progress units per layer index)
    * - LAYER_COUNT: number of stacked slabs
+   *
+   * SIGNAL FLOW (current along traces) — tune colors in <style> via CSS vars:
+   * - --signal-color: pulse stroke color
+   * - --signal-glow: SVG feDropShadow / filter tint
    */
-  const VIEWBOX = { x: -142, y: -118, w: 218, h: 218 };
+  const VIEWBOX = { x: -158, y: -132, w: 298, h: 248 };
 
   const SCROLL_RANGE = 400;
   const LAYER_COUNT = 7;
@@ -97,26 +102,25 @@
     };
   }
 
-  // PCB traces: Manhattan routes from footprint — edit coords here for length/count
-  const traces: [number, number, number][][] = [
-    // East
+  // PCB traces on the board plane (z = 0)
+  const pcbTraces: [number, number, number][][] = [
     [
       [X0 + CHIP_W, -6, 0],
-      [84, -6, 0],
-      [84, -32, 0],
-      [96, -32, 0],
+      [78, -6, 0],
+      [78, -32, 0],
+      [86, -32, 0],
     ],
     [
       [X0 + CHIP_W, 10, 0],
-      [78, 10, 0],
-      [78, 28, 0],
-      [94, 28, 0],
+      [72, 10, 0],
+      [72, 28, 0],
+      [84, 28, 0],
     ],
     [
       [X0 + CHIP_W, 0, 0],
-      [92, 0, 0],
-      [92, -48, 0],
-      [98, -48, 0],
+      [82, 0, 0],
+      [82, -48, 0],
+      [88, -48, 0],
     ],
     // North
     [
@@ -178,10 +182,10 @@
     // NE / NW (extra spokes)
     [
       [X0 + CHIP_W, Y0 + 10, 0],
-      [58, Y0 + 10, 0],
-      [58, -58, 0],
-      [76, -58, 0],
-      [76, -78, 0],
+      [54, Y0 + 10, 0],
+      [54, -58, 0],
+      [68, -58, 0],
+      [68, -74, 0],
     ],
     [
       [X0 + 10, Y0, 0],
@@ -199,12 +203,30 @@
     ],
     [
       [X0 + CHIP_W - 10, Y0 + CHIP_D, 0],
-      [X0 + CHIP_W - 10, 62, 0],
-      [52, 62, 0],
-      [72, 62, 0],
-      [72, 88, 0],
+      [X0 + CHIP_W - 10, 58, 0],
+      [48, 58, 0],
+      [64, 58, 0],
+      [64, 82, 0],
     ],
   ];
+
+  // Vertical traces from the MCU apex toward the navbar (z axis = up on screen)
+  const navbarTraces: [number, number, number][][] = [
+    [
+      [0, 0, 5],
+      [0, 0, 40],
+      [0, 0, 76],
+      [0, 0, 102],
+    ],
+    [
+      [-9, 5, 5],
+      [-9, 5, 46],
+      [11, 5, 46],
+      [11, 5, 96],
+    ],
+  ];
+
+  const allTraces = [...pcbTraces, ...navbarTraces];
 
   const footprint = poly([
     [X0, Y0, 0],
@@ -244,22 +266,55 @@
 </script>
 
 <div
-  class="chip-animation pointer-events-none relative h-[100dvh] w-full bg-black"
+  class="chip-animation pointer-events-none absolute inset-0 z-0 w-full bg-black"
   aria-hidden="true"
 >
   <svg
-    class="chip-animation__svg absolute inset-y-0 right-0 h-full w-[92%] sm:w-[80%] lg:w-[70%] xl:max-w-6xl"
+    class="chip-animation__svg absolute inset-0 mx-auto h-full w-full lg:inset-y-0 lg:right-0 lg:mx-0 lg:w-[70%] xl:max-w-6xl"
     viewBox={`${VIEWBOX.x} ${VIEWBOX.y} ${VIEWBOX.w} ${VIEWBOX.h}`}
     preserveAspectRatio="xMidYMid meet"
+    overflow="visible"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <!-- Static isometric PCB: footprint, traces, pads -->
-    <g stroke="#ffffff" stroke-opacity="0.25" fill="none" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round">
+    <defs>
+      <filter id="trace-signal-glow" x="-80%" y="-80%" width="260%" height="260%">
+        <!-- Keep flood-color in sync with --signal-glow below -->
+        <feDropShadow dx="0" dy="0" stdDeviation="1.8" flood-color="#67e8f9" flood-opacity="0.85" />
+      </filter>
+    </defs>
+
+    <!-- PCB footprint + static traces (behind the die stack) -->
+    <g
+      class="trace-base"
+      stroke="#ffffff"
+      stroke-opacity="0.25"
+      fill="none"
+      stroke-width="0.9"
+      stroke-linejoin="round"
+      stroke-linecap="round"
+    >
       <polygon points={footprint} stroke-width="1.1" />
-      {#each traces as points}
+      {#each allTraces as points}
         <polyline points={tracePath(points)} />
         {@const [px, py] = padPoint(points)}
         <circle cx={px} cy={py} r="3.2" fill="#ffffff" fill-opacity="0.25" stroke="none" />
+      {/each}
+    </g>
+
+    <!-- Current pulses along traces (behind the die stack) -->
+    <g
+      class="trace-signals"
+      fill="none"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      filter="url(#trace-signal-glow)"
+    >
+      {#each allTraces as points, index}
+        <polyline
+          points={tracePath(points)}
+          class="trace-signal"
+          style={`animation-delay: ${(index * 0.11) % 1.8}s`}
+        />
       {/each}
     </g>
 
@@ -279,10 +334,63 @@
     /* Never block page scroll or capture clicks */
     pointer-events: none;
     touch-action: pan-y;
+    overflow: hidden;
+
+    /* Signal flow colors — edit these */
+    --signal-color: #22d3ee;
+    --signal-glow: #67e8f9; /* also update flood-color in #trace-signal-glow above */
+
+    /* Narrow: sit behind hero copy, faded so text stays readable */
+    opacity: 0.38;
+
+    /* Narrow: zoom the chip larger than hero text (traces may clip at edges) */
+    --mobile-scale: 1.85;
+  }
+
+  @media (min-width: 1024px) {
+    .chip-animation {
+      opacity: 1;
+    }
+  }
+
+  .trace-signal {
+    stroke: var(--signal-color);
+    stroke-width: 1.15;
+    stroke-dasharray: 5 16;
+    animation: trace-signal-flow 1.7s linear infinite;
+  }
+
+  @keyframes trace-signal-flow {
+    to {
+      stroke-dashoffset: -21;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .trace-signal {
+      animation: none;
+      stroke-dasharray: none;
+    }
   }
 
   .chip-animation__svg {
-    /* Panel width: increase w-[…] / max-w-… to enlarge; decrease x in VIEWBOX to shift right */
-    left: auto;
+    /* Narrow: centered behind copy, scaled up. Wide (lg+): anchored on the right */
+    left: 0;
+    right: 0;
+    transform: scale(var(--mobile-scale));
+    transform-origin: 50% 46%;
+  }
+
+  @media (min-width: 1024px) {
+    .chip-animation {
+      --mobile-scale: 1;
+    }
+
+    .chip-animation__svg {
+      left: auto;
+      right: 0;
+      transform: none;
+      transform-origin: center;
+    }
   }
 </style>
