@@ -2,6 +2,8 @@
   "name": "Alejandro Enriquez",
   "subtitle": "Embedded Software Engineer",
   "description": "Embedded Software Engineer with 4 years developing firmware on CAN-based multi-ECU architectures. Proven ability to own problems end-to-end, from hardware bring-up to manufacturing support. Experienced in V-model, HIL, and cross-site collaboration.",
+  "workspaceImage": "/images/hero/workspace.svg",
+  "workspaceImageAlt": "Embedded software workspace with development board, debugger, and laptop",
   "primaryCta": {
     "label": "Get in Touch",
     "href": "#contact"

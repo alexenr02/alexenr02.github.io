@@ -16,7 +16,7 @@ const projects = all.sort((a, b) => {
 });
 ---
 
-<section id="projects" class="scroll-mt-20 bg-card py-section">
+<section id="projects" class="scroll-mt-[var(--nav-height)] bg-card py-section">
   <div class="container mx-auto px-4">
     <h2 class="mb-12 text-3xl font-bold text-foreground md:text-4xl">Projects</h2>
 
@@ -38,7 +38,7 @@ const projects = all.sort((a, b) => {
                     alt={project.data.title}
                     width={640}
                     height={360}
-                    class="h-full w-full object-cover"
+                    class="h-full w-full object-cover object-top"
                     data-no-border
                   />
                 </div>

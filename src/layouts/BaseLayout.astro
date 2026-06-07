@@ -2,7 +2,6 @@
 // Base layout for all pages
 // Provides semantic HTML structure, no-flash theme script, and common elements
 
-import { ViewTransitions } from 'astro:transitions';
 import MetaTags from '@components/seo/MetaTags.astro';
 import StructuredData from '@components/seo/StructuredData.astro';
 import Navbar from '@components/common/Navbar.astro';
@@ -15,9 +14,14 @@ interface Props {
   ogImage?: string;
   canonical?: string;
   noindex?: boolean;
+  /** When false, the page handles navbar offset itself (e.g. project hero). */
+  mainOffset?: boolean;
+  /** URLs to prefetch in the background (e.g. ["/"] on project pages). */
+  prefetch?: string[];
 }
 
-const { title, description, ogImage, canonical, noindex } = Astro.props;
+const { title, description, ogImage, canonical, noindex, mainOffset = true, prefetch } =
+  Astro.props;
 ---
 
 <!doctype html>
@@ -55,8 +59,11 @@ const { title, description, ogImage, canonical, noindex } = Astro.props;
     <link rel="preload" href="/fonts/GeistVF.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/GeistMonoVF.woff2" as="font" type="font/woff2" crossorigin />
 
-    <!-- View Transitions API for smooth page navigation -->
-    <ViewTransitions />
+    {
+      prefetch?.map((href) => (
+        <link rel="prefetch" href={href} as="document" />
+      ))
+    }
   </head>
 
   <body class="flex min-h-screen flex-col">
@@ -67,7 +74,10 @@ const { title, description, ogImage, canonical, noindex } = Astro.props;
     <Navbar />
 
     <!-- Main Content -->
-    <main id="main-content" class="flex-1 pt-20">
+    <main
+      id="main-content"
+      class:list={['flex-1', mainOffset && 'pt-[var(--nav-height)]']}
+    >
       <slot />
     </main>
 

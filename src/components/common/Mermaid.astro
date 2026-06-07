@@ -542,8 +542,9 @@ const { code, label, caption } = Astro.props;
   });
   observer.observe(document.documentElement, { attributes: true });
 
-  // astro:page-load fires on the initial load and after every view-transition
-  // navigation, so a single listener covers first paint and re-paints. Using
-  // only this event (not a bare call) avoids two renders racing on load.
-  document.addEventListener('astro:page-load', renderAll);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderAll, { once: true });
+  } else {
+    renderAll();
+  }
 </script>

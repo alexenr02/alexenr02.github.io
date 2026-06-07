@@ -1,0 +1,272 @@
+---
+// Clickable project cover image with a fullscreen lightbox.
+import { Image, getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+}
+
+const { src, alt } = Astro.props;
+const fullSize = await getImage({ src, width: 1920, height: 1080, format: 'webp' });
+---
+
+<div class="project-hero">
+  <button
+    type="button"
+    class="project-hero__trigger group relative block w-full overflow-hidden"
+    aria-label={`Expand ${alt}`}
+    data-project-hero-trigger
+  >
+    <Image
+      src={src}
+      alt={alt}
+      width={1920}
+      height={1080}
+      class="project-hero__image transition-transform duration-200 group-hover:scale-[1.01]"
+      data-no-border
+    />
+    <span class="project-hero__fade project-hero__fade--bottom-blur" aria-hidden="true"></span>
+    <span class="project-hero__fade project-hero__fade--bottom" aria-hidden="true"></span>
+    <span class="project-hero__expand" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 3h6v6"></path>
+        <path d="m21 3-7 7"></path>
+        <path d="m3 21 7-7"></path>
+        <path d="M9 21H3v-6"></path>
+      </svg>
+    </span>
+  </button>
+
+  <div class="project-hero-lightbox" data-project-hero-lightbox role="dialog" aria-modal="true" aria-label={alt}>
+    <button type="button" class="project-hero-lightbox__close" aria-label="Close">&times;</button>
+    <img src={fullSize.src} alt={alt} class="project-hero-lightbox__image" />
+  </div>
+</div>
+
+<style>
+  .project-hero {
+    /* Self-contained offset below the fixed navbar */
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+    padding-top: var(--nav-height);
+    min-height: 100dvh;
+  }
+
+  .project-hero__trigger {
+    /* Fill the viewport area below the navbar */
+    height: calc(100dvh - var(--nav-height));
+    cursor: zoom-in;
+  }
+
+  .project-hero__trigger picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .project-hero__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Keep titles and top artwork visible; crop from the bottom only */
+    object-position: center top;
+  }
+
+  .project-hero__fade {
+    position: absolute;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Soft blur band — approximates a Gaussian falloff at the hero bottom. */
+  .project-hero__fade--bottom-blur {
+    bottom: 0;
+    height: 18%;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    mask-image: linear-gradient(
+      to top,
+      rgb(0 0 0 / 100%) 0%,
+      rgb(0 0 0 / 70%) 30%,
+      rgb(0 0 0 / 20%) 65%,
+      rgb(0 0 0 / 0%) 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to top,
+      rgb(0 0 0 / 100%) 0%,
+      rgb(0 0 0 / 70%) 30%,
+      rgb(0 0 0 / 20%) 65%,
+      rgb(0 0 0 / 0%) 100%
+    );
+  }
+
+  /* Multi-stop fade into the page background (matches text area). */
+  .project-hero__fade--bottom {
+    bottom: 0;
+    height: 20%;
+    background: linear-gradient(
+      to top,
+      var(--color-bg) 0%,
+      color-mix(in srgb, var(--color-bg) 96%, transparent) 18%,
+      color-mix(in srgb, var(--color-bg) 78%, transparent) 40%,
+      color-mix(in srgb, var(--color-bg) 45%, transparent) 65%,
+      transparent 100%
+    );
+  }
+
+  .project-hero__expand {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--color-border);
+    background: color-mix(in srgb, var(--color-bg) 85%, transparent);
+    color: var(--color-text);
+    opacity: 0;
+    transform: translateY(4px);
+    transition:
+      opacity 0.18s ease,
+      transform 0.18s ease;
+  }
+
+  .project-hero__trigger:hover .project-hero__expand,
+  .project-hero__trigger:focus-visible .project-hero__expand {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+
+<style is:global>
+  .project-hero-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2vmin;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.18s ease,
+      visibility 0.18s ease;
+  }
+
+  .project-hero-lightbox.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .project-hero-lightbox__image {
+    display: block;
+    max-width: min(96vw, 1400px);
+    max-height: 92vh;
+    width: auto;
+    height: auto;
+    border-radius: 0.5rem;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+    transform: scale(0.94);
+    transition: transform 0.18s ease;
+  }
+
+  .project-hero-lightbox.is-open .project-hero-lightbox__image {
+    transform: scale(1);
+  }
+
+  .project-hero-lightbox__close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 0.35rem;
+    background: rgba(0, 0, 0, 0.45);
+    color: #ffffff;
+    font-size: 1.35rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .project-hero-lightbox__close:hover {
+    background: rgba(0, 0, 0, 0.65);
+  }
+</style>
+
+<script>
+  function closeProjectHeroLightboxes() {
+    document.querySelectorAll('.project-hero-lightbox.is-open').forEach((lightbox) => {
+      lightbox.classList.remove('is-open');
+    });
+    document.body.style.overflow = '';
+  }
+
+  function initProjectHero() {
+    document.querySelectorAll('[data-project-hero-trigger]').forEach((trigger) => {
+      if (!(trigger instanceof HTMLButtonElement) || trigger.dataset.bound === 'true') return;
+
+      const root = trigger.closest('.project-hero');
+      const lightbox = root?.querySelector<HTMLElement>('[data-project-hero-lightbox]');
+      const closeBtn = lightbox?.querySelector<HTMLButtonElement>('.project-hero-lightbox__close');
+      if (!lightbox) return;
+
+      // Escape parent stacking contexts (e.g. project-content z-20) by mounting on body.
+      if (lightbox.parentElement !== document.body) {
+        document.body.appendChild(lightbox);
+      }
+
+      trigger.dataset.bound = 'true';
+
+      const open = () => {
+        lightbox.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+      };
+
+      const close = () => {
+        lightbox.classList.remove('is-open');
+        document.body.style.overflow = '';
+      };
+
+      trigger.addEventListener('click', open);
+      closeBtn?.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        close();
+      });
+      lightbox.addEventListener('click', (event) => {
+        if (event.target === lightbox) close();
+      });
+    });
+  }
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeProjectHeroLightboxes();
+  });
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initProjectHero, { once: true });
+  } else {
+    initProjectHero();
+  }
+</script>

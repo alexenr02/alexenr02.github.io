@@ -4,8 +4,9 @@
 // contains the write-up and the Mermaid diagrams for each section.
 
 import { getCollection } from 'astro:content';
-import { Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
 import BaseLayout from '@layouts/BaseLayout.astro';
+import ProjectHeroImage from '@components/common/ProjectHeroImage.astro';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects', ({ data }) => !data.draft);
@@ -19,86 +20,206 @@ const { project } = Astro.props;
 const { Content } = await project.render();
 const { data } = project;
 
+const coverBackdrop = data.thumbnail
+  ? await getImage({ src: data.thumbnail, width: 1920, height: 1080, format: 'webp' })
+  : null;
+
 // Format a date as "Month YYYY".
 function formatDate(date: Date): string {
   return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 }
 ---
 
-<BaseLayout title={data.title} description={data.description} ogImage={data.ogImage}>
-  <article class="py-section">
-    <div class="container mx-auto px-4">
-      <!-- Back link -->
-      <a
-        href="/#projects"
-        class="mb-8 inline-flex items-center gap-1 text-sm font-medium text-secondary transition-colors hover:text-primary"
-      >
-        <span aria-hidden="true">&larr;</span> Back to projects
-      </a>
-
-      <!-- Header -->
-      <header class="mb-12 max-w-3xl">
-        <span
-          class="mb-4 inline-block w-fit rounded-md border border-border bg-card px-2 py-0.5 font-mono text-xs uppercase tracking-wide text-secondary"
-        >
-          {data.category}
-        </span>
-        <h1 class="mb-4 text-3xl font-bold text-foreground md:text-4xl">{data.title}</h1>
-        <p class="mb-6 text-lg leading-relaxed text-secondary">{data.description}</p>
-
-        <!-- Tech stack -->
-        <div class="mb-6 flex flex-wrap gap-2">
-          {
-            data.techStack.map((tech) => (
-              <span class="rounded border border-border bg-card px-2.5 py-0.5 text-xs font-medium text-secondary">
-                {tech}
-              </span>
-            ))
-          }
+<BaseLayout title={data.title} description={data.description} ogImage={data.ogImage} mainOffset={false} prefetch={['/']}>
+  <article class="relative overflow-hidden">
+    {
+      coverBackdrop && (
+        <div class="project-cover-backdrop pointer-events-none absolute inset-x-0 bottom-0 top-[var(--nav-height)]" aria-hidden="true">
+          <img
+            src={coverBackdrop.src}
+            alt=""
+            class="project-cover-backdrop__image"
+            loading="eager"
+            decoding="async"
+          />
+          <div class="project-cover-backdrop__scrim" />
         </div>
+      )
+    }
 
-        <!-- Meta + links -->
-        <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-secondary">
-          <span>{formatDate(data.date)}</span>
-          {
-            data.githubUrl && (
-              <a href={data.githubUrl} class="text-primary hover:underline" rel="noopener noreferrer">
-                Source
-              </a>
-            )
-          }
-          {
-            data.liveUrl && (
-              <a href={data.liveUrl} class="text-primary hover:underline" rel="noopener noreferrer">
-                Live
-              </a>
-            )
-          }
-        </div>
-      </header>
-
-      <!-- Optional hero image -->
-      {
-        data.thumbnail && (
-          <div class="mb-12 overflow-hidden rounded-lg border border-border">
-            <Image
-              src={data.thumbnail}
-              alt={data.title}
-              width={1280}
-              height={720}
-              class="w-full"
-              data-no-border
-            />
-          </div>
-        )
-      }
-
-      <!-- MDX body: prose for text, Mermaid components for diagrams -->
-      <div
-        class="prose prose-neutral max-w-3xl dark:prose-invert prose-headings:font-semibold prose-headings:text-foreground prose-p:text-secondary prose-li:text-secondary prose-strong:text-foreground prose-a:text-primary prose-table:text-secondary prose-th:text-foreground"
-      >
-        <Content />
+    {data.thumbnail && (
+      <div class="relative z-10">
+        <ProjectHeroImage src={data.thumbnail} alt={data.title} />
       </div>
-    </div>
+    )}
+
+    {
+      data.thumbnail ? (
+        <div class="project-content relative z-20">
+          <div class="container mx-auto px-4 pb-section">
+            <!-- Back link -->
+            <a
+              href="/#projects"
+              class="mb-6 inline-flex w-fit items-center gap-1 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-cyan-600 transition-colors hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300"
+            >
+              <span aria-hidden="true">&larr;</span> Back to projects
+            </a>
+
+            <!-- Header -->
+            <header class="mb-12 max-w-3xl">
+              <span
+                class="mb-4 inline-block w-fit rounded-md border border-border bg-card px-2 py-0.5 font-mono text-xs uppercase tracking-wide text-secondary"
+              >
+                {data.category}
+              </span>
+              <h1 class="mb-4 text-3xl font-bold text-foreground md:text-4xl">{data.title}</h1>
+              <p class="mb-6 text-lg leading-relaxed text-secondary">{data.description}</p>
+
+              <!-- Tech stack -->
+              <div class="mb-6 flex flex-wrap gap-2">
+                {
+                  data.techStack.map((tech) => (
+                    <span class="rounded border border-border bg-card px-2.5 py-0.5 text-xs font-medium text-secondary">
+                      {tech}
+                    </span>
+                  ))
+                }
+              </div>
+
+              <!-- Meta + links -->
+              <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-secondary">
+                <span>{formatDate(data.date)}</span>
+                {
+                  data.githubUrl && (
+                    <a href={data.githubUrl} class="text-primary hover:underline" rel="noopener noreferrer">
+                      Source
+                    </a>
+                  )
+                }
+                {
+                  data.liveUrl && (
+                    <a href={data.liveUrl} class="text-primary hover:underline" rel="noopener noreferrer">
+                      Live
+                    </a>
+                  )
+                }
+              </div>
+            </header>
+
+            <!-- MDX body: prose for text, Mermaid components for diagrams -->
+            <div
+              class="prose prose-neutral max-w-3xl dark:prose-invert prose-headings:font-semibold prose-h2:text-cyan-600 dark:prose-h2:text-cyan-400 prose-h3:text-foreground prose-h4:text-foreground prose-p:text-secondary prose-li:text-secondary prose-strong:text-foreground prose-a:text-primary prose-table:text-secondary prose-th:text-foreground"
+            >
+              <Content />
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div class="relative z-10 py-section">
+          <div class="container mx-auto px-4 pb-section">
+            <!-- Back link -->
+            <a
+              href="/#projects"
+              class="mb-6 inline-flex w-fit items-center gap-1 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-cyan-600 transition-colors hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300"
+            >
+              <span aria-hidden="true">&larr;</span> Back to projects
+            </a>
+
+            <!-- Header -->
+            <header class="mb-12 max-w-3xl">
+              <span
+                class="mb-4 inline-block w-fit rounded-md border border-border bg-card px-2 py-0.5 font-mono text-xs uppercase tracking-wide text-secondary"
+              >
+                {data.category}
+              </span>
+              <h1 class="mb-4 text-3xl font-bold text-foreground md:text-4xl">{data.title}</h1>
+              <p class="mb-6 text-lg leading-relaxed text-secondary">{data.description}</p>
+
+              <div class="mb-6 flex flex-wrap gap-2">
+                {
+                  data.techStack.map((tech) => (
+                    <span class="rounded border border-border bg-card px-2.5 py-0.5 text-xs font-medium text-secondary">
+                      {tech}
+                    </span>
+                  ))
+                }
+              </div>
+
+              <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-secondary">
+                <span>{formatDate(data.date)}</span>
+                {
+                  data.githubUrl && (
+                    <a href={data.githubUrl} class="text-primary hover:underline" rel="noopener noreferrer">
+                      Source
+                    </a>
+                  )
+                }
+                {
+                  data.liveUrl && (
+                    <a href={data.liveUrl} class="text-primary hover:underline" rel="noopener noreferrer">
+                      Live
+                    </a>
+                  )
+                }
+              </div>
+            </header>
+
+            <div
+              class="prose prose-neutral max-w-3xl dark:prose-invert prose-headings:font-semibold prose-h2:text-cyan-600 dark:prose-h2:text-cyan-400 prose-h3:text-foreground prose-h4:text-foreground prose-p:text-secondary prose-li:text-secondary prose-strong:text-foreground prose-a:text-primary prose-table:text-secondary prose-th:text-foreground"
+            >
+              <Content />
+            </div>
+          </div>
+        </div>
+      )
+    }
   </article>
 </BaseLayout>
+
+<style>
+  /*
+   * Text placement & background fade — tune these variables:
+   *
+   * --project-content-overlap   How far the text block is pulled up over the hero.
+   *                             Lower = text sits lower (e.g. 16vh, 12vh, 0).
+   *
+   * --project-content-fade-mid  Where the background starts becoming opaque.
+   * --project-content-fade-end  Where the background is fully solid.
+   */
+  .project-content {
+    --project-content-overlap: 20vh;
+    --project-content-fade-mid: 18vh;
+    --project-content-fade-end: 20vh;
+
+    margin-top: calc(-1 * var(--project-content-overlap));
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      color-mix(in srgb, var(--color-bg) 55%, transparent) var(--project-content-fade-mid),
+      var(--color-bg) var(--project-content-fade-end),
+      var(--color-bg) 100%
+    );
+  }
+
+  .project-cover-backdrop__image {
+    position: absolute;
+    top: 0;
+    left: -10%;
+    right: -10%;
+    bottom: -10%;
+    width: 120%;
+    height: 110%;
+    object-fit: cover;
+    filter: blur(48px) saturate(1.15);
+    opacity: 0.45;
+    transform: scale(1.05);
+  }
+
+  .project-cover-backdrop__scrim {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--color-bg) 78%, transparent);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+</style>

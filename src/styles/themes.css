@@ -2,6 +2,9 @@
    Light theme is the default, dark theme activated via data-theme="dark" */
 
 :root {
+  /* Fixed navbar height — keep in sync with Navbar.astro */
+  --nav-height: 4rem;
+
   /* Light theme colors */
   --color-bg: #ffffff;
   --color-text: #0a0a0a;

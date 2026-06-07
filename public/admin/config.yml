@@ -62,6 +62,13 @@ collections:
           - { name: name, label: Headline (your name), widget: string }
           - { name: subtitle, label: Subtitle (job title), widget: string }
           - { name: description, label: Description paragraph, widget: text }
+          - name: workspaceImage
+            label: Workspace Photo
+            widget: image
+            media_folder: /public/images/hero
+            public_folder: /images/hero
+            choose_url: false
+          - { name: workspaceImageAlt, label: Workspace Photo Alt Text, widget: string }
           - name: primaryCta
             label: Primary Button
             widget: object

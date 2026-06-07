@@ -8,14 +8,15 @@ import { Menu, X } from 'lucide-svelte';
 ---
 
 <nav
-  class="bg-background/80 fixed left-0 right-0 top-0 z-50 border-b border-border backdrop-blur-sm"
+  id="site-nav"
+  class="site-nav fixed left-0 right-0 top-0 z-50 h-[var(--nav-height)]"
   aria-label="Main navigation"
 >
-  <div class="container mx-auto flex items-center justify-between px-4 py-4">
+  <div class="site-nav__bar container mx-auto flex h-full items-center justify-between px-4">
     <!-- Logo / Site Name -->
     <a
-      href="/"
-      class="text-xl font-bold text-foreground transition-colors hover:text-primary"
+      href="/#home"
+      class="site-nav__logo text-xl font-bold leading-none text-foreground transition-colors hover:text-primary"
       aria-label="Home"
     >
       AE
@@ -25,10 +26,7 @@ import { Menu, X } from 'lucide-svelte';
     <div class="hidden items-center gap-8 md:flex">
       {
         NAV_ITEMS.map((item) => (
-          <a
-            href={item.href}
-            class="text-sm font-medium text-foreground transition-colors hover:text-primary"
-          >
+          <a href={item.href} class="site-nav__link text-base font-medium leading-none transition-colors">
             {item.label}
           </a>
         ))
@@ -44,7 +42,7 @@ import { Menu, X } from 'lucide-svelte';
 
       <button
         id="mobile-menu-button"
-        class="rounded-lg p-2 text-foreground transition-colors hover:bg-gray-200 dark:hover:bg-gray-800"
+        class="site-nav__menu-btn rounded-lg p-2 text-foreground transition-colors"
         aria-label="Toggle menu"
         aria-expanded="false"
         aria-controls="mobile-menu"
@@ -58,7 +56,7 @@ import { Menu, X } from 'lucide-svelte';
   <!-- Mobile Menu -->
   <div
     id="mobile-menu"
-    class="hidden border-t border-border bg-background md:hidden"
+    class="site-nav__mobile hidden border-t border-border bg-background md:hidden"
     role="navigation"
     aria-label="Mobile navigation"
   >
@@ -67,7 +65,7 @@ import { Menu, X } from 'lucide-svelte';
         NAV_ITEMS.map((item) => (
           <a
             href={item.href}
-            class="rounded-lg px-4 py-3 text-base font-medium text-foreground transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+            class="site-nav__mobile-link rounded-lg px-4 py-3 text-lg font-medium transition-colors"
           >
             {item.label}
           </a>
@@ -77,58 +75,197 @@ import { Menu, X } from 'lucide-svelte';
   </div>
 </nav>
 
-<!-- Mobile menu toggle script -->
+<style>
+  .site-nav {
+    background: transparent;
+    border-bottom: 1px solid transparent;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      backdrop-filter 0.2s ease;
+  }
+
+  .site-nav__bar {
+    min-height: var(--nav-height);
+  }
+
+  /* Center labels and controls vertically within the bar. */
+  .site-nav__logo,
+  .site-nav__link,
+  .site-nav__menu-btn,
+  .site-nav :global(.theme-toggle) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    line-height: 1;
+  }
+
+  /* Solid bar after scrolling or while the mobile menu is open. */
+  .site-nav.is-scrolled {
+    background: color-mix(in srgb, var(--color-bg) 92%, transparent);
+    border-bottom-color: var(--color-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .site-nav a,
+  .site-nav button {
+    min-width: 0;
+  }
+
+  .site-nav__link {
+    color: var(--color-secondary);
+  }
+
+  .site-nav__link:hover {
+    color: var(--color-text);
+  }
+
+  .site-nav__menu-btn:hover {
+    background: color-mix(in srgb, var(--color-card-bg) 80%, transparent);
+  }
+
+  .site-nav__mobile-link {
+    color: var(--color-text);
+  }
+
+  .site-nav__mobile-link:hover {
+    background: var(--color-card-bg);
+  }
+</style>
+
+<!-- Mobile menu toggle + fast in-page nav -->
 <script>
-  // Mobile menu functionality
-  const menuButton = document.getElementById('mobile-menu-button');
-  const mobileMenu = document.getElementById('mobile-menu');
-  const menuIcon = document.getElementById('menu-icon');
-  const closeIcon = document.getElementById('close-icon');
+  function closeMobileMenu() {
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuButton = document.getElementById('mobile-menu-button');
+    const menuIcon = document.getElementById('menu-icon');
+    const closeIcon = document.getElementById('close-icon');
+    if (!mobileMenu || !menuButton || !menuIcon || !closeIcon) return;
 
-  if (menuButton && mobileMenu && menuIcon && closeIcon) {
-    menuButton.addEventListener('click', () => {
-      const isExpanded = menuButton.getAttribute('aria-expanded') === 'true';
+    mobileMenu.classList.add('hidden');
+    menuIcon.classList.remove('hidden');
+    closeIcon.classList.add('hidden');
+    menuButton.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+    updateNavScrollState();
+  }
 
-      // Toggle menu visibility
-      mobileMenu.classList.toggle('hidden');
+  function updateNavScrollState() {
+    const nav = document.getElementById('site-nav');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (!nav) return;
 
-      // Toggle icons
-      menuIcon.classList.toggle('hidden');
-      closeIcon.classList.toggle('hidden');
+    const menuOpen = mobileMenu !== null && !mobileMenu.classList.contains('hidden');
+    nav.classList.toggle('is-scrolled', window.scrollY > 8 || menuOpen);
+  }
 
-      // Update ARIA attribute
-      menuButton.setAttribute('aria-expanded', String(!isExpanded));
+  let navScrollBound = false;
 
-      // Prevent body scroll when menu is open
-      if (!isExpanded) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = '';
-      }
-    });
+  function initNavScroll() {
+    updateNavScrollState();
+    if (navScrollBound) return;
+    navScrollBound = true;
+    window.addEventListener('scroll', updateNavScrollState, { passive: true });
+  }
 
-    // Close menu when clicking on a link
-    const mobileLinks = mobileMenu.querySelectorAll('a');
-    mobileLinks.forEach((link) => {
-      link.addEventListener('click', () => {
-        mobileMenu.classList.add('hidden');
-        menuIcon.classList.remove('hidden');
-        closeIcon.classList.add('hidden');
-        menuButton.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
+  function navScrollBehavior(): ScrollBehavior {
+    return 'auto';
+  }
+
+  function scrollToNavTarget(hash: string) {
+    if (!hash || hash === '#') {
+      window.scrollTo({ top: 0, behavior: navScrollBehavior() });
+      return;
+    }
+
+    const target = document.querySelector(hash);
+    if (target instanceof HTMLElement) {
+      target.scrollIntoView({ behavior: navScrollBehavior(), block: 'start' });
+    }
+  }
+
+  function scrollToHashFromLocation() {
+    if (!window.location.hash) return;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        scrollToNavTarget(window.location.hash);
+        updateNavScrollState();
       });
     });
+  }
 
-    // Close menu when pressing Escape
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !mobileMenu.classList.contains('hidden')) {
-        mobileMenu.classList.add('hidden');
-        menuIcon.classList.remove('hidden');
-        closeIcon.classList.add('hidden');
-        menuButton.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
-        menuButton.focus();
-      }
+  function handleNavClick(event: MouseEvent) {
+    const link = event.currentTarget;
+    if (!(link instanceof HTMLAnchorElement)) return;
+
+    const url = new URL(link.href, window.location.origin);
+    if (url.origin !== window.location.origin) return;
+
+    const samePage =
+      url.pathname === window.location.pathname && url.search === window.location.search;
+
+    // Same-page hash nav: instant scroll, skip view-transition page swap.
+    if (samePage) {
+      event.preventDefault();
+      scrollToNavTarget(url.hash);
+      history.pushState(null, '', url.hash ? `${url.pathname}${url.search}${url.hash}` : `${url.pathname}${url.search}`);
+      closeMobileMenu();
+      updateNavScrollState();
+    }
+  }
+
+  function initMobileMenu() {
+    const menuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuIcon = document.getElementById('menu-icon');
+    const closeIcon = document.getElementById('close-icon');
+
+    if (!menuButton || !mobileMenu || !menuIcon || !closeIcon || menuButton.dataset.bound === 'true') {
+      return;
+    }
+
+    menuButton.dataset.bound = 'true';
+
+    menuButton.addEventListener('click', () => {
+      const isExpanded = menuButton.getAttribute('aria-expanded') === 'true';
+      mobileMenu.classList.toggle('hidden');
+      menuIcon.classList.toggle('hidden');
+      closeIcon.classList.toggle('hidden');
+      menuButton.setAttribute('aria-expanded', String(!isExpanded));
+      document.body.style.overflow = !isExpanded ? 'hidden' : '';
+      updateNavScrollState();
     });
   }
+
+  document.addEventListener('keydown', (event) => {
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuButton = document.getElementById('mobile-menu-button');
+    if (event.key !== 'Escape' || !mobileMenu || mobileMenu.classList.contains('hidden') || !menuButton) {
+      return;
+    }
+
+    closeMobileMenu();
+    menuButton.focus();
+  });
+
+  function initNavLinks() {
+    document.querySelectorAll('nav a[href]').forEach((link) => {
+      if (!(link instanceof HTMLAnchorElement) || link.dataset.navBound === 'true') return;
+      link.dataset.navBound = 'true';
+      link.addEventListener('click', handleNavClick);
+    });
+  }
+
+  function initNavbar() {
+    initNavScroll();
+    initMobileMenu();
+    initNavLinks();
+    scrollToHashFromLocation();
+    updateNavScrollState();
+  }
+
+  initNavbar();
 </script>
