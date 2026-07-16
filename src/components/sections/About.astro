@@ -1,87 +1,71 @@
 ---
-// About section
-// All editable copy lives in src/content/about/about.json
+// Option C: thin about band — one sentence, resume, links
 
 import about from '../../content/about/about.json';
-import { Download } from 'lucide-svelte';
+import { SITE, SOCIAL_LINKS } from '@lib/constants';
 
 const aboutPhoto = about.photo?.trim() || undefined;
 ---
 
-<section id="about" class="scroll-mt-[var(--nav-height)] py-section">
+<section id="about" class="about-band scroll-mt-[var(--nav-height)] border-y border-border py-10 md:py-12">
   <div class="container mx-auto px-4">
-    <h2 class="mb-12 text-3xl font-bold text-foreground md:text-4xl">{about.sectionTitle}</h2>
-
-    <div class="grid gap-12 md:grid-cols-2 md:gap-16">
-      <!-- Photo Column -->
-      <div class="flex flex-col items-center md:items-start">
+    <div class="flex flex-col gap-8 md:flex-row md:items-center md:justify-between md:gap-12">
+      <div class="flex items-start gap-4 md:items-center">
         <div
-          class="relative mb-6 h-64 w-64 overflow-hidden rounded-lg border-2 border-dashed border-border bg-card shadow-lg md:h-80 md:w-80"
-          aria-label={aboutPhoto ? undefined : 'Photo placeholder'}
+          class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-card md:h-20 md:w-20"
         >
           {
             aboutPhoto ? (
               <img
                 src={aboutPhoto}
-                alt={about.photoAlt || 'About photo'}
+                alt={about.photoAlt || 'Portrait'}
                 class="h-full w-full object-cover"
                 loading="lazy"
                 decoding="async"
               />
             ) : (
-              <div class="h-full w-full bg-card" aria-hidden="true"></div>
+              <span class="font-mono text-lg font-semibold text-foreground" aria-hidden="true">
+                AE
+              </span>
             )
           }
         </div>
+        <div class="max-w-xl">
+          <p class="text-lg leading-snug text-foreground md:text-xl">{about.tagline}</p>
+          <p class="mt-1 text-sm text-secondary">{about.subheading}</p>
+        </div>
+      </div>
 
-        <!-- Resume Download Button -->
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
         <a
           href={about.resume.path}
           download
-          class="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-white transition-colors hover:bg-primary/90"
+          class="font-medium text-foreground underline-offset-4 hover:underline"
         >
-          <Download class="h-5 w-5" aria-hidden="true" />
           {about.resume.buttonLabel}
         </a>
-      </div>
-
-      <!-- Content Column -->
-      <div class="space-y-6">
-        <div>
-          <h3 class="mb-4 text-2xl font-semibold text-foreground">
-            {about.subheading}
-          </h3>
-          {
-            about.paragraphs.map((paragraph) => (
-              <p class="mb-4 text-lg leading-relaxed text-secondary">{paragraph}</p>
-            ))
-          }
-        </div>
-
-        <!-- Key Achievements -->
-        <div>
-          <h4 class="mb-3 text-xl font-semibold text-foreground">Key Achievements</h4>
-          <ul class="space-y-2 text-secondary">
-            {
-              about.achievements.map((item) => (
-                <li class="flex items-start gap-2">
-                  <span class="mt-1 text-primary">•</span>
-                  <span>{item}</span>
-                </li>
-              ))
-            }
-          </ul>
-        </div>
-
-        <!-- Education -->
-        <div>
-          <h4 class="mb-3 text-xl font-semibold text-foreground">Education</h4>
-          <div class="text-secondary">
-            <p class="font-semibold text-foreground">{about.education.school}</p>
-            <p class="mt-1">{about.education.degree}</p>
-            <p class="mt-1 text-sm">{about.education.note}</p>
-          </div>
-        </div>
+        <a
+          href={`mailto:${SITE.email}`}
+          class="text-secondary underline-offset-4 hover:text-foreground hover:underline"
+        >
+          Email
+        </a>
+        <a
+          href={SOCIAL_LINKS.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-secondary underline-offset-4 hover:text-foreground hover:underline"
+        >
+          LinkedIn
+        </a>
+        <a
+          href={SOCIAL_LINKS.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-secondary underline-offset-4 hover:text-foreground hover:underline"
+        >
+          GitHub
+        </a>
       </div>
     </div>
   </div>

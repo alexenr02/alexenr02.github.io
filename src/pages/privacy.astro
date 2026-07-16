@@ -1,6 +1,6 @@
 ---
 // Privacy Policy Page
-// Comprehensive privacy policy documenting all data collection
+// Documents actual data handling for this static portfolio
 
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { SITE } from '@lib/constants';
@@ -32,44 +32,33 @@ import { SITE } from '@lib/constants';
         <ul class="mb-4 list-disc space-y-2 pl-6 text-secondary">
           <li>
             This site does not use any analytics service. No pageview tracking, no cookies, no
-            personal data collected.
+            personal data collected for analytics.
           </li>
         </ul>
 
         <h3 class="mb-2 text-xl font-semibold text-foreground">Contact</h3>
         <ul class="mb-4 list-disc space-y-2 pl-6 text-secondary">
           <li>
-            Contact is handled via direct email to {SITE.email}. No form submissions are stored
-            on any third-party server.
+            Contact is handled via direct email to {SITE.email}. No contact form submissions are
+            stored on any third-party server by this site.
           </li>
         </ul>
 
-        <h3 class="mb-2 text-xl font-semibold text-foreground">Spam Protection</h3>
+        <h3 class="mb-2 text-xl font-semibold text-foreground">Error tracking</h3>
         <ul class="mb-4 list-disc space-y-2 pl-6 text-secondary">
           <li>
-            <strong>Cloudflare Turnstile:</strong> Used to prevent spam on the contact form. May set cookies
-            for CAPTCHA verification.
-          </li>
-        </ul>
-
-        <h3 class="mb-2 text-xl font-semibold text-foreground">Error Tracking</h3>
-        <ul class="mb-4 list-disc space-y-2 pl-6 text-secondary">
-          <li>
-            <strong>Sentry:</strong> Tracks runtime errors to improve site stability. Collects browser
-            info, error stack traces, and anonymized user interactions.
+            No client-side error tracking service is currently enabled. If that changes, this page
+            will be updated first.
           </li>
         </ul>
       </section>
 
       <section class="mb-8">
-        <h2 class="mb-4 text-2xl font-semibold text-foreground">Cookies</h2>
+        <h2 class="mb-4 text-2xl font-semibold text-foreground">Local storage</h2>
         <ul class="list-disc space-y-2 pl-6 text-secondary">
           <li>
-            <strong>Theme Preference:</strong> localStorage (not a cookie) stores your dark/light mode
-            preference
-          </li>
-          <li>
-            <strong>Cloudflare Turnstile:</strong> May set cookies for CAPTCHA verification
+            <strong>Theme preference:</strong> localStorage (not a cookie) stores your dark/light
+            mode choice so the site remembers it on the next visit.
           </li>
         </ul>
       </section>
@@ -78,9 +67,11 @@ import { SITE } from '@lib/constants';
         <h2 class="mb-4 text-2xl font-semibold text-foreground">Your Rights</h2>
         <p class="mb-4 text-secondary">You have the right to:</p>
         <ul class="list-disc space-y-2 pl-6 text-secondary">
-          <li>Request deletion of any data submitted via contact form</li>
-          <li>Opt out of analytics (use browser extensions or disable JavaScript)</li>
-          <li>Clear your browser's localStorage to reset theme preference</li>
+          <li>Clear your browser's localStorage to reset the theme preference</li>
+          <li>
+            Contact me about any personal data you sent by email (for example, asking me to delete
+            a message I received)
+          </li>
         </ul>
       </section>
 
@@ -89,27 +80,11 @@ import { SITE } from '@lib/constants';
         <p class="mb-4 text-secondary">This website uses the following third-party services:</p>
         <ul class="list-disc space-y-2 pl-6 text-secondary">
           <li>
-            <strong>GitHub Pages:</strong> Hosting - <a
+            <strong>GitHub Pages:</strong> Hosting — <a
               href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement"
               target="_blank"
               rel="noopener noreferrer"
               class="text-primary hover:underline">Privacy Statement</a
-            >
-          </li>
-          <li>
-            <strong>Cloudflare:</strong> Turnstile spam protection - <a
-              href="https://www.cloudflare.com/privacypolicy/"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-primary hover:underline">Privacy Policy</a
-            >
-          </li>
-          <li>
-            <strong>Sentry:</strong> Error tracking - <a
-              href="https://sentry.io/privacy/"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-primary hover:underline">Privacy Policy</a
             >
           </li>
         </ul>

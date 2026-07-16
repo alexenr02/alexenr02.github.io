@@ -1,24 +1,30 @@
 {
-  "sectionTitle": "About Me",
+  "sectionTitle": "About",
   "photo": "",
   "photoAlt": "",
   "subheading": "Firmware & Embedded Software Engineer",
-  "paragraphs": [
-    "Embedded Software Engineer with 4 years developing firmware on CAN-based multi-ECU architectures. Proven ability to own problems end-to-end, from hardware bring-up to manufacturing support.",
-    "Delivered a cross-generation Software Thread Watchdog (ARM Cortex-M4/embOS and Cortex-M7/MQX), reduced build times by ~65%, and unblocked stalled production lines. Experienced in V-model development, HIL testing, and cross-site collaboration with teams across Mexico, the US, and China."
-  ],
-  "achievements": [
-    "65% faster builds (20+ min down to ~7 min)",
-    "2 production-critical products unblocked from PPAP",
-    "Cross-generation Software Thread Watchdog deployed on two hardware platforms (embOS & MQX)"
+  "tagline": "I own embedded problems end-to-end — from dead prototypes to production lines.",
+  "metrics": [
+    {
+      "value": "65%",
+      "label": "faster builds"
+    },
+    {
+      "value": "2",
+      "label": "products unblocked from PPAP"
+    },
+    {
+      "value": "2",
+      "label": "RTOS platforms, one watchdog"
+    }
   ],
   "education": {
-    "school": "Tecnológico de Monterrey (ITESM) | Nuevo León, México",
-    "degree": "B.S. in Digital Systems and Robotics Engineering — 2023",
-    "note": "Full Scholarship \"Líderes del Mañana\" — awarded for academic excellence and leadership potential."
+    "school": "Tecnológico de Monterrey (ITESM)",
+    "degree": "B.S. Digital Systems and Robotics — 2023",
+    "note": "Full Scholarship \"Líderes del Mañana\""
   },
   "resume": {
     "path": "/resume/Resume_AlexE_v1.5.0.pdf",
-    "buttonLabel": "Download Resume"
+    "buttonLabel": "Resume"
   }
 }

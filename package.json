@@ -17,7 +17,6 @@
     "@astrojs/svelte": "^7.2.5",
     "@astrojs/tailwind": "^6.0.2",
     "@mermaid-js/layout-elk": "^0.2.1",
-    "@sentry/astro": "^10.35.0",
     "@tailwindcss/forms": "^0.5.11",
     "@tailwindcss/typography": "^0.5.19",
     "astro": "^5.16.11",
@@ -30,8 +29,8 @@
     "zod": "^3.22.0"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
+    "@typescript-eslint/eslint-plugin": "^8.64.0",
+    "@typescript-eslint/parser": "^8.64.0",
     "eslint": "^8.57.1",
     "eslint-plugin-astro": "^0.31.4",
     "eslint-plugin-svelte": "^2.46.1",

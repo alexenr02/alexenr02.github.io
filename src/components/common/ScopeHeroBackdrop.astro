@@ -1,0 +1,159 @@
+---
+// Full-bleed scope / signal backdrop for Option B hero
+// CSS-driven sweep; respects prefers-reduced-motion
+---
+
+<div class="scope-hero" aria-hidden="true">
+  <svg class="scope-hero__svg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <pattern id="scope-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.35" />
+      </pattern>
+      <pattern id="scope-grid-major" width="200" height="200" patternUnits="userSpaceOnUse">
+        <path d="M 200 0 L 0 0 0 200" fill="none" stroke="currentColor" stroke-width="1" opacity="0.45" />
+      </pattern>
+      <linearGradient id="scope-fade" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="var(--signal)" stop-opacity="0" />
+        <stop offset="15%" stop-color="var(--signal)" stop-opacity="1" />
+        <stop offset="85%" stop-color="var(--signal)" stop-opacity="1" />
+        <stop offset="100%" stop-color="var(--signal)" stop-opacity="0" />
+      </linearGradient>
+    </defs>
+
+    <rect width="1200" height="800" fill="url(#scope-grid)" class="scope-hero__grid" />
+    <rect width="1200" height="800" fill="url(#scope-grid-major)" class="scope-hero__grid" />
+
+    <!-- Baseline / zero line -->
+    <line x1="0" y1="400" x2="1200" y2="400" class="scope-hero__baseline" />
+
+    <!-- Primary waveform (CAN-ish differential feel) -->
+    <path
+      class="scope-hero__wave scope-hero__wave--a"
+      fill="none"
+      stroke="url(#scope-fade)"
+      stroke-width="2.5"
+      stroke-linecap="round"
+      d="M0,400 C80,400 100,220 180,220 S280,580 360,580 S460,220 540,220 S640,580 720,580 S820,220 900,220 S1000,400 1080,400 S1160,400 1200,400"
+    />
+    <path
+      class="scope-hero__wave scope-hero__wave--b"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      opacity="0.45"
+      d="M0,400 C80,400 100,580 180,580 S280,220 360,220 S460,580 540,580 S640,220 720,220 S820,580 900,580 S1000,400 1080,400 S1160,400 1200,400"
+    />
+
+    <!-- Trigger marker -->
+    <g class="scope-hero__trigger">
+      <line x1="180" y1="80" x2="180" y2="720" />
+      <polygon points="180,72 188,88 172,88" />
+      <text x="190" y="100" class="scope-hero__label">TRIG</text>
+    </g>
+
+    <!-- Channel labels -->
+    <text x="48" y="210" class="scope-hero__label">CH1 CAN_H</text>
+    <text x="48" y="590" class="scope-hero__label">CH2 CAN_L</text>
+  </svg>
+
+  <div class="scope-hero__vignette"></div>
+</div>
+
+<style>
+  .scope-hero {
+    --signal: #c4892a;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 80% 60% at 70% 45%, #1a2e24 0%, transparent 55%),
+      linear-gradient(160deg, #0a1210 0%, #101a16 45%, #0c1411 100%);
+    color: #3d5c4a;
+  }
+
+  .scope-hero__svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .scope-hero__grid {
+    color: #2a4338;
+  }
+
+  .scope-hero__baseline {
+    stroke: #3d5c4a;
+    stroke-width: 1;
+    stroke-dasharray: 6 8;
+    opacity: 0.55;
+  }
+
+  .scope-hero__wave--a {
+    stroke-dasharray: 1400;
+    stroke-dashoffset: 1400;
+    animation: scope-sweep 4.5s ease-in-out infinite;
+  }
+
+  .scope-hero__wave--b {
+    stroke: #5a8f72;
+    stroke-dasharray: 1400;
+    stroke-dashoffset: 1400;
+    animation: scope-sweep 4.5s ease-in-out 0.15s infinite;
+  }
+
+  .scope-hero__trigger {
+    stroke: #c4892a;
+    fill: #c4892a;
+    opacity: 0.7;
+  }
+
+  .scope-hero__trigger line {
+    stroke-width: 1;
+    stroke-dasharray: 4 6;
+  }
+
+  .scope-hero__label {
+    fill: #7a9a88;
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 14px;
+    letter-spacing: 0.12em;
+  }
+
+  .scope-hero__vignette {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(8, 14, 12, 0.88) 0%, rgba(8, 14, 12, 0.35) 42%, transparent 70%),
+      linear-gradient(0deg, rgba(8, 14, 12, 0.55) 0%, transparent 35%);
+    pointer-events: none;
+  }
+
+  @keyframes scope-sweep {
+    0% {
+      stroke-dashoffset: 1400;
+      opacity: 0.35;
+    }
+    18% {
+      opacity: 1;
+    }
+    55% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+    }
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 0.55;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scope-hero__wave--a,
+    .scope-hero__wave--b {
+      animation: none;
+      stroke-dashoffset: 0;
+      opacity: 0.85;
+    }
+  }
+</style>

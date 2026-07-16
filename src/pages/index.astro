@@ -1,49 +1,67 @@
 ---
-// Homepage
-// Hero copy comes from src/content/hero/hero.json (editable via /admin)
+// Homepage — Option C: Gallery portfolio
+// Projects lead; about is a thin band; resume holds the rest
 
 import BaseLayout from '@layouts/BaseLayout.astro';
 import About from '@components/sections/About.astro';
-import Skills from '@components/sections/Skills.astro';
-import WorkExperience from '@components/sections/WorkExperience.astro';
 import Projects from '@components/sections/Projects.astro';
 import Contact from '@components/sections/Contact.astro';
 import ChipAnimation from '@components/common/ChipAnimation.svelte';
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import hero from '../content/hero/hero.json';
+
+const featured = (
+  await getCollection('projects', ({ data }) => !data.draft && !data.archived && data.featured)
+).sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99))[0];
+
+const heroThumb = featured?.data.thumbnail;
 ---
 
 <BaseLayout>
-  <!-- Hero Section -->
+  <!-- Full-bleed hero: project still when available, chip as ambient fallback -->
   <section
     id="home"
-    class="relative min-h-[100dvh] scroll-mt-[var(--nav-height)] bg-black"
+    class="relative min-h-[100dvh] scroll-mt-[var(--nav-height)] overflow-hidden bg-black"
   >
-    <ChipAnimation client:visible />
+    {
+      heroThumb ? (
+        <Image
+          src={heroThumb}
+          alt=""
+          width={1920}
+          height={1080}
+          class="absolute inset-0 h-full w-full object-cover object-top"
+          data-no-border
+          loading="eager"
+          fetchpriority="high"
+        />
+      ) : (
+        <ChipAnimation client:visible />
+      )
+    }
 
     <div
-      class="hero-copy relative z-10 flex min-h-[100dvh] items-center px-4 py-12 lg:pointer-events-none lg:absolute lg:inset-0 lg:py-0"
-    >
+      class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-black/25"
+      aria-hidden="true"
+    />
+
+    <div class="relative z-10 flex min-h-[100dvh] items-end px-4 pb-16 pt-28 md:items-center md:pb-24">
       <div class="container mx-auto">
-        <div class="max-w-xl text-center lg:text-left">
-          <h1 class="mb-4 text-4xl font-bold text-white md:text-5xl lg:text-6xl">
+        <div class="max-w-3xl">
+          <h1 class="text-5xl font-bold tracking-tight text-white sm:text-6xl md:text-7xl lg:text-8xl">
             {hero.name}
           </h1>
-          <p class="mb-6 text-xl text-white/80 md:text-2xl">{hero.subtitle}</p>
-          <p class="mb-8 text-lg leading-relaxed text-white/70">
-            {hero.description}
+          <p class="mt-4 font-mono text-sm uppercase tracking-[0.22em] text-white/70 md:text-base">
+            {hero.subtitle}
           </p>
-          <div class="pointer-events-auto flex flex-wrap justify-center gap-4 lg:justify-start">
+          <div class="mt-8">
             <a
               href={hero.primaryCta.href}
-              class="rounded-lg bg-white px-6 py-3 font-medium text-black transition-colors hover:bg-white/90"
+              class="inline-flex items-center gap-2 border border-white bg-white px-7 py-3.5 text-sm font-medium tracking-wide text-black transition-colors hover:bg-transparent hover:text-white"
             >
               {hero.primaryCta.label}
-            </a>
-            <a
-              href={hero.secondaryCta.href}
-              class="rounded-lg border border-white/40 px-6 py-3 font-medium text-white transition-colors hover:bg-white/10"
-            >
-              {hero.secondaryCta.label}
+              <span aria-hidden="true">↓</span>
             </a>
           </div>
         </div>
@@ -51,26 +69,7 @@ import hero from '../content/hero/hero.json';
     </div>
   </section>
 
-  <!-- About Section -->
-  <About />
-
-  <!-- Skills Section -->
-  <Skills />
-
-  <!-- Work Experience Section -->
-  <WorkExperience />
-
-  <!-- Projects Section -->
   <Projects />
-
-  <!-- Lab/Experiments Section (Placeholder) -->
-  <section id="lab" class="scroll-mt-[var(--nav-height)] py-section">
-    <div class="container mx-auto px-4">
-      <h2 class="mb-8 text-3xl font-bold text-foreground md:text-4xl">Lab & Experiments</h2>
-      <p class="text-lg text-secondary">Interactive experiments coming soon.</p>
-    </div>
-  </section>
-
-  <!-- Contact Section -->
+  <About />
   <Contact />
 </BaseLayout>

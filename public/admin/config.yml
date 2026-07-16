@@ -7,21 +7,21 @@ backend:
   name: github
   repo: alexenr02/alexenr02.github.io
   branch: main
-  # Set base_url to the deployed Sveltia CMS Authenticator (Cloudflare Worker)
-  # once the OAuth proxy is live. Until then, you can log in by clicking
-  # "Sign In with Token" on the login screen and pasting a personal access
-  # token (Sveltia provides the link with the right scopes).
+  # Prefer the Sveltia CMS Authenticator (Cloudflare Worker) instead of pasting
+  # a long-lived GitHub PAT into the browser. Set base_url once the worker is live:
   # base_url: https://your-worker-subdomain.workers.dev
+  #
+  # Until then: use "Sign In with Token" with a fine-scoped PAT, and revoke it
+  # when you are done editing. Never commit tokens to this repo.
 
 # Default media destination. Per-field media_folder values below override
 # this for specific cases (logos, resume PDF).
 media_folder: public/images
 public_folder: /images
 
-# When true, edits go through pull requests with a draft/in-review/ready
-# workflow. For a single-author personal site, simple direct commits are
-# nicer. Flip to true if you ever want a review buffer.
-publish_mode: simple
+# Edits open as pull requests instead of writing straight to main.
+# Safer for a public /admin/ surface; merge when ready.
+publish_mode: editorial_workflow
 
 collections:
   # ---------------------------------------------------------------------------
@@ -100,14 +100,14 @@ collections:
             public_folder: /images/about
           - { name: photoAlt, label: Photo Alt Text, widget: string, required: false }
           - { name: subheading, label: Subheading, widget: string }
-          - name: paragraphs
-            label: Paragraphs
+          - { name: tagline, label: One-line tagline, widget: string }
+          - name: metrics
+            label: Metric chips
+            label_singular: Metric
             widget: list
-            field: { name: paragraph, label: Paragraph, widget: text }
-          - name: achievements
-            label: Key Achievements
-            widget: list
-            field: { name: achievement, label: Achievement, widget: string }
+            fields:
+              - { name: value, label: Value (e.g. 65%), widget: string }
+              - { name: label, label: Label, widget: string }
           - name: education
             label: Education
             widget: object
@@ -128,7 +128,7 @@ collections:
 
   - name: skills
     label: Skills Section
-    description: Technical skill groups shown as cards. Drag to reorder.
+    description: Highlight skills shown as a board strip. Drag to reorder.
     files:
       - name: skills
         label: Skills
@@ -136,16 +136,13 @@ collections:
         format: json
         fields:
           - { name: sectionTitle, label: Section Title, widget: string }
-          - name: groups
-            label: Skill Groups
-            label_singular: Skill Group
+          - name: highlights
+            label: Skill highlights
+            label_singular: Skill
             widget: list
             fields:
-              - { name: category, label: Category Name, widget: string }
-              - name: skills
-                label: Skills in this category
-                widget: list
-                field: { name: skill, label: Skill, widget: string }
+              - { name: name, label: Skill name, widget: string }
+              - { name: group, label: Group label (e.g. RTOS), widget: string }
 
   # ---------------------------------------------------------------------------
   # Folder collection (one file per work experience entry)

@@ -1,27 +1,64 @@
 ---
-// Skills section
-// Categories and skills come from src/content/skills/skills.json
+// Option B: Stack — protocol / firmware stack diagram (not skill pills)
 
-import skills from '../../content/skills/skills.json';
+const layers = [
+  {
+    id: 'app',
+    label: 'Application',
+    items: ['Watchdogs', 'Actuation', 'Diagnostics', 'Build tooling'],
+  },
+  {
+    id: 'rtos',
+    label: 'RTOS',
+    items: ['embOS', 'MQX', 'FreeRTOS'],
+  },
+  {
+    id: 'bus',
+    label: 'Bus & I/O',
+    items: ['CAN', 'J1939', 'UART', 'SPI', 'RS-232'],
+  },
+  {
+    id: 'mcu',
+    label: 'MCU',
+    items: ['Cortex-M4', 'Cortex-M7', 'PIC18', 'PIC32'],
+  },
+  {
+    id: 'lang',
+    label: 'Languages',
+    items: ['Embedded C', 'C++', 'Python'],
+  },
+  {
+    id: 'method',
+    label: 'Method',
+    items: ['V-model', 'HIL', 'Bring-up', 'Traceability'],
+  },
+];
 ---
 
-<section id="skills" class="scroll-mt-20 bg-card py-section">
+<section id="stack" class="stack-section scroll-mt-[var(--nav-height)] border-y border-border bg-card py-section">
   <div class="container mx-auto px-4">
-    <h2 class="mb-12 text-3xl font-bold text-foreground md:text-4xl">{skills.sectionTitle}</h2>
+    <div class="mb-3 flex items-center gap-3">
+      <span class="font-mono text-xs uppercase tracking-[0.2em] text-secondary">CH2</span>
+      <h2 class="text-3xl font-bold text-foreground md:text-4xl">Stack</h2>
+    </div>
+    <p class="mb-10 max-w-lg text-secondary">
+      How the work layers — from silicon up to the systems that ship.
+    </p>
 
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="stack-diagram mx-auto max-w-2xl" role="list">
       {
-        skills.groups.map((group) => (
-          <div class="rounded-lg border border-border bg-background p-6">
-            <h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-primary">
-              {group.category}
-            </h3>
-            <div class="flex flex-wrap gap-2">
-              {group.skills.map((skill) => (
-                <span class="rounded-md border border-border px-3 py-1 text-sm text-foreground">
-                  {skill}
-                </span>
-              ))}
+        layers.map((layer, i) => (
+          <div class="stack-layer" role="listitem" style={`--i: ${i}`}>
+            <div class="stack-layer__rail" aria-hidden="true">
+              <span class="stack-layer__tick" />
+            </div>
+            <div class="stack-layer__panel">
+              <p class="stack-layer__label">{layer.label}</p>
+              <div class="stack-layer__items">
+                {layer.items.map((item) => (
+                  <span class="stack-layer__item">{item}</span>
+                ))}
+              </div>
             </div>
           </div>
         ))
@@ -29,3 +66,89 @@ import skills from '../../content/skills/skills.json';
     </div>
   </div>
 </section>
+
+<style>
+  .stack-diagram {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .stack-layer {
+    display: grid;
+    grid-template-columns: 1.25rem 1fr;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+
+  .stack-layer__rail {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  .stack-layer__rail::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--color-signal, #c4892a);
+    opacity: 0.55;
+  }
+
+  .stack-layer__tick {
+    position: relative;
+    z-index: 1;
+    align-self: center;
+    width: 0.65rem;
+    height: 0.65rem;
+    border: 2px solid var(--color-signal, #c4892a);
+    background: var(--color-card-bg);
+    transform: rotate(45deg);
+  }
+
+  .stack-layer__panel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.65rem 1rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    padding: 0.85rem 1rem;
+    /* Width steps like a schematic block stack */
+    margin-left: calc(var(--i) * 0.35rem);
+    margin-right: calc((5 - var(--i)) * 0.35rem);
+  }
+
+  .stack-layer__label {
+    flex: 0 0 auto;
+    min-width: 6.5rem;
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-signal, #c4892a);
+  }
+
+  .stack-layer__items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .stack-layer__item {
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 0.75rem;
+    color: var(--color-text);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-signal, #c4892a) 35%, transparent);
+    padding-bottom: 1px;
+  }
+
+  @media (max-width: 640px) {
+    .stack-layer__panel {
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+</style>

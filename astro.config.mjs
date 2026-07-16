@@ -33,6 +33,8 @@ export default defineConfig({
       img: false,
       js: true,
       svg: true,
+      // Keep Sveltia CMS binary untouched so the SRI hash stays valid
+      Exclude: [(file) => file.includes('admin/vendor/sveltia-cms.js')],
     }),
   ],
 
@@ -57,9 +59,6 @@ export default defineConfig({
           },
         },
       },
-    },
-    optimizeDeps: {
-      exclude: ['@sentry/astro'],
     },
   },
 

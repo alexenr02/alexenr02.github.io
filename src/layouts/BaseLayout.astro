@@ -27,6 +27,13 @@ const { title, description, ogImage, canonical, noindex, mainOffset = true, pref
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Security headers via meta (GitHub Pages cannot set HTTP headers) -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: https:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
     <!-- No-flash theme script - runs before page render -->
     <script is:inline>
       (function () {
@@ -83,8 +90,5 @@ const { title, description, ogImage, canonical, noindex, mainOffset = true, pref
 
     <!-- Footer -->
     <Footer />
-
-    <!-- Sentry Error Tracking (Phase 8) -->
-    <!-- Will be added in Phase 8 with proper configuration -->
   </body>
 </html>

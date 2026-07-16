@@ -1,79 +1,21 @@
 {
-  "sectionTitle": "Technical Skills",
-  "groups": [
-    {
-      "category": "Languages",
-      "skills": [
-        "Embedded C",
-        "C++",
-        "Python",
-        "PowerShell"
-      ]
-    },
-    {
-      "category": "Microcontrollers",
-      "skills": [
-        "ARM Cortex-M4",
-        "ARM Cortex-M7",
-        "PIC18",
-        "PIC32"
-      ]
-    },
-    {
-      "category": "RTOS",
-      "skills": [
-        "embOS",
-        "MQX",
-        "FreeRTOS"
-      ]
-    },
-    {
-      "category": "Communication & Interfaces",
-      "skills": [
-        "CAN",
-        "J1939",
-        "UART",
-        "RS-232",
-        "SPI"
-      ]
-    },
-    {
-      "category": "Tools",
-      "skills": [
-        "J-Link",
-        "Kvaser",
-        "Peak",
-        "BUSMASTER",
-        "Git",
-        "GCC",
-        "IBM Rhapsody",
-        "Polarion",
-        "Jira",
-        "IBM Jazz/RTC",
-        "Bitbucket",
-        "GitHub"
-      ]
-    },
-    {
-      "category": "Practices & Methods",
-      "skills": [
-        "V-model development",
-        "HIL testing",
-        "Hardware bring-up",
-        "Requirements traceability",
-        "Agile/Scrum"
-      ]
-    },
-    {
-      "category": "Lab Equipment",
-      "skills": [
-        "Oscilloscope",
-        "Spectrum analyzer",
-        "CAN bus sniffer",
-        "Multimeter",
-        "Soldering",
-        "Harness building"
-      ]
-    }
+  "sectionTitle": "Skills",
+  "highlights": [
+    { "name": "Embedded C", "group": "Lang" },
+    { "name": "C++", "group": "Lang" },
+    { "name": "Python", "group": "Lang" },
+    { "name": "Cortex-M4/M7", "group": "MCU" },
+    { "name": "embOS", "group": "RTOS" },
+    { "name": "MQX", "group": "RTOS" },
+    { "name": "FreeRTOS", "group": "RTOS" },
+    { "name": "CAN / J1939", "group": "Bus" },
+    { "name": "UART / SPI", "group": "Bus" },
+    { "name": "HIL", "group": "Method" },
+    { "name": "V-model", "group": "Method" },
+    { "name": "Bring-up", "group": "Method" },
+    { "name": "J-Link", "group": "Tool" },
+    { "name": "Kvaser / Peak", "group": "Tool" },
+    { "name": "Scope", "group": "Lab" },
+    { "name": "Git", "group": "Tool" }
   ]
 }

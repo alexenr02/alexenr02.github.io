@@ -19,10 +19,7 @@ export const SOCIAL_LINKS = {
 } as const;
 
 export const NAV_ITEMS = [
-  { href: '/#home', label: 'Home' },
+  { href: '/#work', label: 'Work' },
   { href: '/#about', label: 'About' },
-  { href: '/#projects', label: 'Projects' },
-  { href: '/#experience', label: 'Work Experience' },
-  { href: '/#lab', label: 'Lab' },
   { href: '/#contact', label: 'Contact' },
 ] as const;

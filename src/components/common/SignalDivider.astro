@@ -1,0 +1,72 @@
+---
+// Schematic-style section divider (Option B)
+interface Props {
+  label?: string;
+}
+
+const { label = '' } = Astro.props;
+---
+
+<div class="signal-divider" aria-hidden="true">
+  <div class="signal-divider__line"></div>
+  {
+    label && (
+      <span class="signal-divider__label">{label}</span>
+    )
+  }
+  <div class="signal-divider__line"></div>
+  <svg class="signal-divider__wave" viewBox="0 0 120 12" preserveAspectRatio="none">
+    <path
+      d="M0 6 H20 L28 2 L36 10 L44 2 L52 10 L60 6 H120"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.25"
+    />
+  </svg>
+</div>
+
+<style>
+  .signal-divider {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    color: var(--color-signal, #c4892a);
+    opacity: 0.75;
+  }
+
+  .signal-divider__line {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-border),
+      var(--color-signal, #c4892a),
+      var(--color-border),
+      transparent
+    );
+  }
+
+  .signal-divider__label {
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+  }
+
+  .signal-divider__wave {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .signal-divider {
+      grid-template-columns: 1fr auto auto 1fr;
+    }
+
+    .signal-divider__wave {
+      display: block;
+      width: 5rem;
+      height: 0.75rem;
+    }
+  }
+</style>
