@@ -70,6 +70,15 @@
     background-color: var(--color-bg);
     color: var(--color-text);
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overflow-x: clip;
+  }
+
+  body {
+    min-height: 100dvh;
+    min-height: 100vh;
+    overflow-x: clip;
   }
 
   /* Respect reduced motion preference */

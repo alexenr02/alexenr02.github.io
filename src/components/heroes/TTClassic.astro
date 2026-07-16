@@ -1,5 +1,5 @@
 ---
-// Type Takeover — looping signal-net video + soft veil
+// Type Takeover — looping signal-net video + soft veil (mobile-safe)
 
 import hero from '../../content/hero/hero.json';
 
@@ -11,7 +11,7 @@ const roleParts = (() => {
 })();
 
 const videoSrc = '/images/hero/signal-net.mp4';
-const posterSrc = '/images/hero/signal-net.png';
+const posterSrc = '/images/hero/signal-net.jpg';
 ---
 
 <section class="tt1 relative min-h-[100dvh] overflow-hidden">
@@ -19,13 +19,14 @@ const posterSrc = '/images/hero/signal-net.png';
   <div class="tt1__bg absolute inset-0" aria-hidden="true">
     <video
       class="tt1__video"
-      src={videoSrc}
+      data-src={videoSrc}
       poster={posterSrc}
-      autoplay
       muted
       loop
       playsinline
-      preload="auto"
+      preload="none"
+      disablepictureinpicture
+      disableremoteplayback
     ></video>
     <div class="tt1__veil"></div>
   </div>
@@ -42,7 +43,7 @@ const posterSrc = '/images/hero/signal-net.png';
   <div class="tt1__wash absolute inset-0" aria-hidden="true"></div>
 
   <!-- Front: copy + CTAs -->
-  <div class="relative z-10 flex min-h-[100dvh] flex-col justify-between px-4 pb-16 pt-28 md:pb-20 md:pt-32">
+  <div class="relative z-10 flex min-h-[100dvh] flex-col justify-between px-4 pb-[max(4rem,env(safe-area-inset-bottom))] pt-[max(7rem,calc(var(--nav-height)+env(safe-area-inset-top)+1.5rem))] md:pb-20 md:pt-32">
     <div class="container mx-auto w-full">
       <div class="tt1__copy max-w-3xl">
         <h1 class="tt1__name mb-3 font-bold tracking-tight text-white md:mb-4">
@@ -64,13 +65,13 @@ const posterSrc = '/images/hero/signal-net.png';
       <div class="flex flex-wrap gap-3">
         <a
           href={hero.primaryCta.href}
-          class="rounded-full bg-white px-7 py-3.5 text-sm font-medium text-[#11324b] hover:bg-white/90"
+          class="tt1__cta rounded-full bg-white px-7 py-3.5 text-sm font-medium text-[#11324b] hover:bg-white/90"
         >
           {hero.primaryCta.label}
         </a>
         <a
           href={hero.secondaryCta.href}
-          class="rounded-full border border-white/40 px-7 py-3.5 text-sm font-medium text-white hover:bg-white/10"
+          class="tt1__cta rounded-full border border-white/40 px-7 py-3.5 text-sm font-medium text-white hover:bg-white/10"
         >
           {hero.secondaryCta.label}
         </a>
@@ -80,21 +81,78 @@ const posterSrc = '/images/hero/signal-net.png';
 </section>
 
 <script>
-  // Pause looping hero video when reduced motion is preferred
-  function syncHeroVideo() {
-    const video = document.querySelector('.tt1__video');
-    if (!(video instanceof HTMLVideoElement)) return;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) {
-      video.pause();
-      video.removeAttribute('autoplay');
-    } else if (video.paused) {
-      video.play().catch(() => {});
-    }
+  function prefersReducedMotion() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
-  syncHeroVideo();
-  document.addEventListener('astro:page-load', syncHeroVideo);
+  function setupHeroVideo() {
+    const video = document.querySelector('.tt1__video');
+    if (!(video instanceof HTMLVideoElement)) return;
+    if (video.dataset.bound === 'true') return;
+    video.dataset.bound = 'true';
+
+    const src = video.dataset.src;
+    if (!src) return;
+
+    // Required for iOS/Android autoplay policies
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+
+    const loadAndPlay = () => {
+      if (prefersReducedMotion()) {
+        video.removeAttribute('src');
+        video.load();
+        return;
+      }
+      if (!video.getAttribute('src')) {
+        video.setAttribute('src', src);
+        video.load();
+      }
+      video.play().catch(() => {});
+    };
+
+    const pauseVideo = () => {
+      if (!video.paused) video.pause();
+    };
+
+    // Only decode while hero is on screen
+    const io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+        if (entry.isIntersecting) loadAndPlay();
+        else pauseVideo();
+      },
+      { threshold: 0.15 }
+    );
+    io.observe(video);
+
+    // Pause in background tabs
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) pauseVideo();
+      else if (video.getBoundingClientRect().bottom > 0) loadAndPlay();
+    });
+
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const onMotionChange = () => {
+      if (prefersReducedMotion()) pauseVideo();
+      else loadAndPlay();
+    };
+    if (typeof motionQuery.addEventListener === 'function') {
+      motionQuery.addEventListener('change', onMotionChange);
+    } else {
+      motionQuery.addListener(onMotionChange);
+    }
+
+    // Kick off if already visible
+    loadAndPlay();
+  }
+
+  setupHeroVideo();
+  document.addEventListener('astro:page-load', setupHeroVideo);
 </script>
 
 <style>
@@ -104,17 +162,18 @@ const posterSrc = '/images/hero/signal-net.png';
 
   .tt1__name {
     font-family: 'Inter', system-ui, sans-serif;
-    font-size: clamp(1.35rem, 3.2vw, 2.35rem);
+    font-size: clamp(1.2rem, 3.2vw, 2.35rem);
     line-height: 1.1;
     font-weight: 700;
   }
 
   .tt1__role {
     font-family: 'DM Sans', system-ui, sans-serif;
-    font-size: clamp(2.75rem, 8vw, 5.75rem);
+    font-size: clamp(2.1rem, 8vw, 5.75rem);
     line-height: 0.95;
     letter-spacing: 0.02em;
     font-weight: 700;
+    overflow-wrap: anywhere;
   }
 
   .tt1__video {
@@ -124,6 +183,8 @@ const posterSrc = '/images/hero/signal-net.png';
     height: 100%;
     object-fit: cover;
     object-position: center 55%;
+    /* Avoid iOS fullscreen quirks */
+    background: #05070a;
   }
 
   .tt1__veil {
@@ -211,6 +272,11 @@ const posterSrc = '/images/hero/signal-net.png';
       transparent 40%,
       rgba(5, 10, 18, 0.35) 100%
     );
+  }
+
+  .tt1__cta {
+    min-height: 44px;
+    touch-action: manipulation;
   }
 
   @keyframes tt1-crest {

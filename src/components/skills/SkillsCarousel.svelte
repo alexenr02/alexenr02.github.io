@@ -1,5 +1,5 @@
 <script lang="ts">
-  // Skills carousel — snap scroll with prev/next
+  // Skills carousel — snap scroll with prev/next (iOS-safe scroll)
 
   type Skill = {
     name: string;
@@ -18,7 +18,14 @@
     const next = Math.max(0, Math.min(items.length - 1, i));
     index = next;
     const card = track.children[next] as HTMLElement | undefined;
-    card?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    if (!card) return;
+
+    // scrollIntoView can vertically jump the page on iOS — keep scroll inside the track
+    const left = card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2;
+    track.scrollTo({
+      left: Math.max(0, left),
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+    });
   }
 
   function onScroll() {
@@ -41,7 +48,13 @@
 
 <div class="sk-carousel">
   <div class="sk-carousel__toolbar">
-    <button type="button" class="sk-carousel__nav" onclick={() => scrollTo(index - 1)} disabled={index === 0} aria-label="Previous skill">
+    <button
+      type="button"
+      class="sk-carousel__nav"
+      onclick={() => scrollTo(index - 1)}
+      disabled={index === 0}
+      aria-label="Previous skill"
+    >
       Prev
     </button>
     <p class="sk-carousel__count">{index + 1} / {items.length}</p>
@@ -56,11 +69,30 @@
     </button>
   </div>
 
-  <div class="sk-carousel__track" bind:this={track} onscroll={onScroll}>
+  <div
+    class="sk-carousel__track"
+    bind:this={track}
+    onscroll={onScroll}
+    role="list"
+    aria-label="Skills carousel"
+  >
     {#each items as item, i}
-      <article class="sk-carousel__card" class:is-active={i === index} aria-current={i === index ? 'true' : undefined}>
+      <article
+        class="sk-carousel__card"
+        class:is-active={i === index}
+        aria-current={i === index ? 'true' : undefined}
+        role="listitem"
+      >
         <div class="sk-carousel__media">
-          <img src={item.image} alt="" width="640" height="360" decoding="async" data-no-border />
+          <img
+            src={item.image}
+            alt=""
+            width="640"
+            height="360"
+            decoding="async"
+            loading={i < 2 ? 'eager' : 'lazy'}
+            data-no-border
+          />
         </div>
         <div class="sk-carousel__body">
           <p class="sk-carousel__group">{item.group}</p>
@@ -77,6 +109,9 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    /* Prevent horizontal page bleed on narrow screens */
+    max-width: 100%;
+    min-width: 0;
   }
 
   .sk-carousel__toolbar {
@@ -94,14 +129,18 @@
   }
 
   .sk-carousel__nav {
+    min-height: 44px;
+    min-width: 44px;
     border: 1px solid var(--color-border);
     border-radius: 999px;
     background: #fff;
-    padding: 0.45rem 1rem;
+    padding: 0.45rem 1.1rem;
     font-size: 0.8rem;
     font-weight: 600;
     color: #232e3a;
     cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .sk-carousel__nav:disabled {
@@ -117,15 +156,24 @@
     display: flex;
     gap: 1rem;
     overflow-x: auto;
+    overflow-y: hidden;
     scroll-snap-type: x mandatory;
     scroll-padding-inline: 1rem;
     padding: 0.25rem 0.15rem 1rem;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x;
+    scrollbar-width: none;
+  }
+
+  .sk-carousel__track::-webkit-scrollbar {
+    display: none;
   }
 
   .sk-carousel__card {
-    flex: 0 0 min(88%, 22rem);
+    flex: 0 0 min(85vw, 22rem);
     scroll-snap-align: center;
+    scroll-snap-stop: always;
     overflow: hidden;
     border-radius: 1rem;
     background: #fff;
@@ -172,6 +220,7 @@
     font-size: 1.15rem;
     font-weight: 700;
     color: #232e3a;
+    overflow-wrap: anywhere;
   }
 
   .sk-carousel__usage {
@@ -183,6 +232,8 @@
   @media (prefers-reduced-motion: reduce) {
     .sk-carousel__card {
       transition: none;
+      transform: none;
+      opacity: 1;
     }
   }
 </style>
