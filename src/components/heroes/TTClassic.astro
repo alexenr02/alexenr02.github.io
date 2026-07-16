@@ -1,7 +1,6 @@
 ---
-// Type Takeover — name in Inter; title larger than name
+// Type Takeover — Signal Beam photo + soft veil
 
-import ChipAnimation from '@components/common/ChipAnimation.svelte';
 import hero from '../../content/hero/hero.json';
 
 const role = hero.subtitle.toUpperCase();
@@ -10,27 +9,45 @@ const roleParts = (() => {
   if (words.length <= 2) return [role];
   return [words.slice(0, -1).join(' '), words[words.length - 1]];
 })();
+
+const photo = '/images/hero/signal-net.png';
 ---
 
-<section class="tt1 relative min-h-[100dvh] overflow-hidden" style="background: #11324b;">
-  <div class="absolute inset-0 opacity-50" aria-hidden="true">
-    <ChipAnimation client:visible />
+<section class="tt1 relative min-h-[100dvh] overflow-hidden">
+  <!-- Back: photo + soft veil -->
+  <div class="tt1__bg absolute inset-0" aria-hidden="true">
+    <img class="tt1__photo" src={photo} alt="" width="1024" height="571" decoding="async" />
+    <div class="tt1__veil"></div>
   </div>
+
+  <!-- Mid: motion above photo, under text -->
+  <div class="tt1__anim absolute inset-0" aria-hidden="true">
+    <div class="tt1__beam"></div>
+    <div class="tt1__crest"></div>
+    <span class="tt1__spark tt1__spark--a"></span>
+    <span class="tt1__spark tt1__spark--b"></span>
+    <span class="tt1__spark tt1__spark--c"></span>
+    <span class="tt1__spark tt1__spark--d"></span>
+  </div>
+
   <div class="tt1__wash absolute inset-0" aria-hidden="true"></div>
 
-  <div class="relative z-10 flex min-h-[100dvh] flex-col justify-between px-4 py-28 md:py-24">
-    <div class="container mx-auto flex flex-1 flex-col justify-center">
-      <h1 class="tt1__name mb-3 font-bold tracking-tight text-white md:mb-4">
-        {hero.name}
-      </h1>
+  <!-- Front: copy + CTAs -->
+  <div class="relative z-10 flex min-h-[100dvh] flex-col justify-between px-4 pb-16 pt-28 md:pb-20 md:pt-32">
+    <div class="container mx-auto w-full">
+      <div class="tt1__copy max-w-3xl">
+        <h1 class="tt1__name mb-3 font-bold tracking-tight text-white md:mb-4">
+          {hero.name}
+        </h1>
 
-      <p class="tt1__role font-bold tracking-tight text-white">
-        {
-          roleParts.map((line, i) => (
-            <span class:list={['block', i > 0 && 'text-white/85']}>{line}</span>
-          ))
-        }
-      </p>
+        <p class="tt1__role font-bold tracking-tight text-white">
+          {
+            roleParts.map((line, i) => (
+              <span class:list={['block', i > 0 && 'text-white/85']}>{line}</span>
+            ))
+          }
+        </p>
+      </div>
     </div>
 
     <div class="container mx-auto flex flex-wrap items-end justify-between gap-6 pt-10">
@@ -54,6 +71,10 @@ const roleParts = (() => {
 </section>
 
 <style>
+  .tt1 {
+    background: #05070a;
+  }
+
   .tt1__name {
     font-family: 'Inter', system-ui, sans-serif;
     font-size: clamp(1.35rem, 3.2vw, 2.35rem);
@@ -69,15 +90,180 @@ const roleParts = (() => {
     font-weight: 700;
   }
 
-  .tt1__wash {
+  .tt1__photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 55%;
+  }
+
+  .tt1__veil {
+    position: absolute;
+    inset: 0;
     background:
-      linear-gradient(
-        180deg,
-        rgba(17, 50, 75, 0.2) 0%,
-        rgba(17, 50, 75, 0.55) 55%,
-        rgba(17, 50, 75, 0.92) 100%
-      ),
-      radial-gradient(ellipse 60% 40% at 70% 40%, rgba(196, 223, 255, 0.15) 0%, transparent 60%);
+      linear-gradient(180deg, rgba(5, 10, 18, 0.55) 0%, transparent 42%),
+      linear-gradient(0deg, rgba(5, 10, 18, 0.72) 0%, transparent 38%),
+      radial-gradient(ellipse 70% 50% at 50% 70%, transparent 20%, rgba(5, 10, 18, 0.45) 100%);
     pointer-events: none;
+  }
+
+  .tt1__anim {
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  /* Diagonal signal beam — full cross, then return */
+  .tt1__beam {
+    position: absolute;
+    top: -45%;
+    left: 0;
+    width: min(38vw, 22rem);
+    height: 190%;
+    background: linear-gradient(
+      105deg,
+      transparent 30%,
+      rgba(77, 214, 255, 0.06) 42%,
+      rgba(16, 132, 116, 0.28) 50%,
+      rgba(255, 200, 120, 0.1) 58%,
+      transparent 70%
+    );
+    transform: skewX(-20deg) translate3d(-55vw, 14vh, 0);
+    will-change: transform;
+    animation: tt1-beam 7s ease-in-out infinite alternate;
+  }
+
+  /* Soft glow riding the wave crest */
+  .tt1__crest {
+    position: absolute;
+    left: 50%;
+    top: 58%;
+    width: min(70vw, 42rem);
+    height: min(28vw, 16rem);
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(77, 214, 255, 0.22) 0%,
+      rgba(16, 132, 116, 0.1) 40%,
+      transparent 72%
+    );
+    animation: tt1-crest 6s ease-in-out infinite;
+  }
+
+  /* Floating bokeh sparks */
+  .tt1__spark {
+    position: absolute;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.85) 0%, rgba(77, 214, 255, 0.35) 45%, transparent 70%);
+    animation: tt1-spark 9s ease-in-out infinite;
+  }
+
+  .tt1__spark--a {
+    width: 7px;
+    height: 7px;
+    left: 18%;
+    top: 42%;
+    animation-delay: 0s;
+  }
+
+  .tt1__spark--b {
+    width: 5px;
+    height: 5px;
+    left: 62%;
+    top: 36%;
+    background: radial-gradient(circle, rgba(255, 180, 90, 0.9) 0%, rgba(255, 140, 40, 0.3) 50%, transparent 70%);
+    animation-delay: -2.2s;
+  }
+
+  .tt1__spark--c {
+    width: 9px;
+    height: 9px;
+    left: 74%;
+    top: 58%;
+    animation-delay: -4.5s;
+  }
+
+  .tt1__spark--d {
+    width: 4px;
+    height: 4px;
+    left: 38%;
+    top: 68%;
+    background: radial-gradient(circle, rgba(255, 200, 120, 0.9) 0%, transparent 70%);
+    animation-delay: -6s;
+  }
+
+  .tt1__wash {
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      rgba(5, 10, 18, 0.12) 0%,
+      transparent 40%,
+      rgba(5, 10, 18, 0.35) 100%
+    );
+  }
+
+  @keyframes tt1-beam {
+    from {
+      transform: skewX(-20deg) translate3d(-55vw, 14vh, 0);
+      opacity: 0.55;
+    }
+    to {
+      transform: skewX(-20deg) translate3d(115vw, -14vh, 0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes tt1-crest {
+    0%,
+    100% {
+      opacity: 0.5;
+      transform: scale(0.94);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.08);
+    }
+  }
+
+  @keyframes tt1-spark {
+    0%,
+    100% {
+      opacity: 0.25;
+      transform: translateY(0) scale(0.85);
+    }
+    40% {
+      opacity: 0.95;
+      transform: translateY(-18px) scale(1.15);
+    }
+    70% {
+      opacity: 0.5;
+      transform: translateY(-8px) scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tt1__beam,
+    .tt1__crest,
+    .tt1__spark {
+      animation: none;
+    }
+
+    .tt1__beam {
+      transform: skewX(-20deg) translate3d(30vw, 0, 0);
+      opacity: 0.7;
+    }
+
+    .tt1__crest {
+      opacity: 0.75;
+      transform: scale(1);
+    }
+
+    .tt1__spark {
+      opacity: 0.55;
+    }
   }
 </style>
