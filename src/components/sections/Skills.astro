@@ -1,11 +1,35 @@
 ---
-// Skills — Accent rail + Terminal tips with context images
+// Skills — 7 layout experiments (picker on html[data-skill-layout])
 
 import skills from '../../content/skills/skills.json';
+import ExperimentPicker from '@components/common/ExperimentPicker.astro';
+import SkillTip from '@components/skills/SkillTip.astro';
+import SkillGroupIcon from '@components/skills/SkillGroupIcon.astro';
+import SkillsCarousel from '@components/skills/SkillsCarousel.svelte';
+import SkillsExpand from '@components/skills/SkillsExpand.svelte';
 
-function tipId(name: string) {
-  return `skill-tip-${name.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`;
+function tipId(prefix: string, name: string) {
+  return `${prefix}-${name.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`;
 }
+
+const items = skills.highlights;
+
+const byGroup = items.reduce<Record<string, typeof items>>((acc, item) => {
+  (acc[item.group] ??= []).push(item);
+  return acc;
+}, {});
+
+const groupOrder = Object.keys(byGroup);
+
+const layoutOptions = [
+  { id: 'rail', label: 'Accent rail' },
+  { id: 'carousel', label: 'Carousel' },
+  { id: 'icons', label: 'Icon grid' },
+  { id: 'media', label: 'Media tiles' },
+  { id: 'grouped', label: 'Grouped columns' },
+  { id: 'signal', label: 'Signal strip' },
+  { id: 'expand', label: 'Inline expand' },
+];
 ---
 
 <section id="skills" class="skills-section scroll-mt-[var(--nav-height)] py-section">
@@ -15,18 +39,55 @@ function tipId(name: string) {
       {skills.sectionTitle}
     </h2>
 
-    <ul class="skills-grid">
-      {
-        skills.highlights.map((item) => (
-          <li class="skills-card">
-            <button type="button" class="skills-card__hit" aria-describedby={tipId(item.name)}>
-              <span class="skills-card__group">{item.group}</span>
-              <span class="skills-card__name">{item.name}</span>
-            </button>
-            <div id={tipId(item.name)} class="skills-card__tip" role="tooltip">
-              <div class="skills-card__tip-media">
+    <!-- 1. Accent rail -->
+    <div class="skills-layout" data-layout="rail">
+      <ul class="sk-rail">
+        {
+          items.map((item) => (
+            <li class="sk-rail__card">
+              <button type="button" class="sk-rail__hit" aria-describedby={tipId('rail', item.name)}>
+                <span class="sk-rail__group">{item.group}</span>
+                <span class="sk-rail__name">{item.name}</span>
+              </button>
+              <SkillTip id={tipId('rail', item.name)} usage={item.usage} image={item.image} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <!-- 2. Carousel -->
+    <div class="skills-layout" data-layout="carousel">
+      <SkillsCarousel client:load items={items} />
+    </div>
+
+    <!-- 3. Icon grid -->
+    <div class="skills-layout" data-layout="icons">
+      <ul class="sk-icons">
+        {
+          items.map((item) => (
+            <li class="sk-icons__card">
+              <button type="button" class="sk-icons__hit" aria-describedby={tipId('icons', item.name)}>
+                <SkillGroupIcon group={item.group} class="sk-icons__glyph" />
+                <span class="sk-icons__name">{item.name}</span>
+                <span class="sk-icons__group">{item.group}</span>
+              </button>
+              <SkillTip id={tipId('icons', item.name)} usage={item.usage} image={item.image} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <!-- 4. Media tiles -->
+    <div class="skills-layout" data-layout="media">
+      <ul class="sk-media">
+        {
+          items.map((item) => (
+            <li class="sk-media__card">
+              <button type="button" class="sk-media__hit" aria-describedby={tipId('media', item.name)}>
                 <img
-                  class="skills-card__tip-img"
+                  class="sk-media__img"
                   src={item.image}
                   alt=""
                   width="640"
@@ -34,82 +95,100 @@ function tipId(name: string) {
                   decoding="async"
                   data-no-border
                 />
-              </div>
-              <div class="skills-card__tip-copy">
-                <p class="skills-card__tip-label">Industry usage</p>
-                <p class="skills-card__tip-body">{item.usage}</p>
-              </div>
+                <span class="sk-media__shade"></span>
+                <span class="sk-media__label">
+                  <span class="sk-media__group">{item.group}</span>
+                  <span class="sk-media__name">{item.name}</span>
+                </span>
+              </button>
+              <SkillTip id={tipId('media', item.name)} usage={item.usage} image={item.image} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <!-- 5. Grouped columns -->
+    <div class="skills-layout" data-layout="grouped">
+      <div class="sk-grouped">
+        {
+          groupOrder.map((group) => (
+            <div class="sk-grouped__col">
+              <h3 class="sk-grouped__title">
+                <SkillGroupIcon group={group} />
+                {group}
+              </h3>
+              <ul class="sk-grouped__list">
+                {byGroup[group].map((item) => (
+                  <li class="sk-grouped__item">
+                    <button type="button" class="sk-grouped__hit" aria-describedby={tipId('grp', item.name)}>
+                      {item.name}
+                    </button>
+                    <SkillTip id={tipId('grp', item.name)} usage={item.usage} image={item.image} />
+                  </li>
+                ))}
+              </ul>
             </div>
-          </li>
-        ))
-      }
-    </ul>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- 6. Signal strip -->
+    <div class="skills-layout" data-layout="signal">
+      <div class="sk-signal">
+        <div class="sk-signal__line" aria-hidden="true"></div>
+        <ul class="sk-signal__nodes">
+          {
+            items.map((item) => (
+              <li class="sk-signal__node">
+                <button type="button" class="sk-signal__hit" aria-describedby={tipId('sig', item.name)}>
+                  <span class="sk-signal__dot"></span>
+                  <span class="sk-signal__name">{item.name}</span>
+                </button>
+                <SkillTip id={tipId('sig', item.name)} usage={item.usage} image={item.image} />
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <!-- 7. Inline expand -->
+    <div class="skills-layout" data-layout="expand">
+      <SkillsExpand client:load items={items} />
+    </div>
   </div>
 </section>
 
+<ExperimentPicker
+  title="Skills layout"
+  storageKey="skill-layout-v1"
+  param="skills"
+  attr="data-skill-layout"
+  defaultId="rail"
+  options={layoutOptions}
+/>
+
 <style>
-  .skills-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem;
+  /* Show only the active layout */
+  .skills-layout {
+    display: none;
   }
 
-  @media (min-width: 768px) {
-    .skills-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
+  :global(html[data-skill-layout='rail']) .skills-layout[data-layout='rail'],
+  :global(html[data-skill-layout='carousel']) .skills-layout[data-layout='carousel'],
+  :global(html[data-skill-layout='icons']) .skills-layout[data-layout='icons'],
+  :global(html[data-skill-layout='media']) .skills-layout[data-layout='media'],
+  :global(html[data-skill-layout='grouped']) .skills-layout[data-layout='grouped'],
+  :global(html[data-skill-layout='signal']) .skills-layout[data-layout='signal'],
+  :global(html[data-skill-layout='expand']) .skills-layout[data-layout='expand'],
+  :global(html:not([data-skill-layout])) .skills-layout[data-layout='rail'] {
+    display: block;
   }
 
-  .skills-card {
-    position: relative;
-  }
-
-  .skills-card__hit {
-    display: flex;
-    width: 100%;
-    min-height: 4.75rem;
-    flex-direction: column;
-    gap: 0.4rem;
-    border: none;
-    border-radius: 0.85rem;
-    border-left: 4px solid #108474;
-    background: #fff;
-    padding: 1rem 1rem 1rem 1.15rem;
-    text-align: left;
-    cursor: default;
-    box-shadow: 0 1px 0 rgba(17, 50, 75, 0.06);
-    transition:
-      box-shadow 0.18s ease,
-      transform 0.18s ease;
-  }
-
-  .skills-card__hit:hover,
-  .skills-card__hit:focus-visible {
-    box-shadow: 0 8px 24px rgba(17, 50, 75, 0.12);
-    transform: translateY(-1px);
-  }
-
-  .skills-card__hit:focus-visible {
-    outline: 3px solid var(--color-focus);
-    outline-offset: 2px;
-  }
-
-  .skills-card__group {
-    font-family: 'Geist Mono', ui-monospace, monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: #5a6b7a;
-  }
-
-  .skills-card__name {
-    font-size: 0.95rem;
-    font-weight: 600;
-    line-height: 1.25;
-    color: #232e3a;
-  }
-
-  .skills-card__tip {
+  /* Shared tip */
+  .skills-section :global(.skill-tip) {
     position: absolute;
     left: 0;
     bottom: calc(100% + 0.55rem);
@@ -130,7 +209,7 @@ function tipId(name: string) {
     pointer-events: none;
   }
 
-  .skills-card__tip::after {
+  .skills-section :global(.skill-tip::after) {
     content: '';
     position: absolute;
     left: 1.25rem;
@@ -139,25 +218,24 @@ function tipId(name: string) {
     border-top-color: #0e1a24;
   }
 
-  .skills-card__tip-media {
+  .skills-section :global(.skill-tip__media) {
     background: #0e1a24;
     border-bottom: 1px solid #2a4558;
   }
 
-  .skills-card__tip-img {
+  .skills-section :global(.skill-tip__img) {
     display: block;
     width: 100%;
     height: auto;
     aspect-ratio: 16 / 9;
     object-fit: contain;
-    object-position: center;
   }
 
-  .skills-card__tip-copy {
+  .skills-section :global(.skill-tip__copy) {
     padding: 0.75rem 0.9rem 0.9rem;
   }
 
-  .skills-card__tip-label {
+  .skills-section :global(.skill-tip__label) {
     margin-bottom: 0.35rem;
     font-family: 'Geist Mono', ui-monospace, monospace;
     font-size: 0.6rem;
@@ -166,41 +244,346 @@ function tipId(name: string) {
     color: #7eb8a8;
   }
 
-  .skills-card__tip-label::before {
+  .skills-section :global(.skill-tip__label::before) {
     content: '> ';
   }
 
-  .skills-card__tip-body {
+  .skills-section :global(.skill-tip__body) {
     font-family: 'Geist Mono', ui-monospace, monospace;
     font-size: 0.72rem;
     line-height: 1.45;
     color: #c4dfff;
   }
 
-  .skills-card:hover .skills-card__tip,
-  .skills-card:focus-within .skills-card__tip {
+  .sk-rail__card:hover :global(.skill-tip),
+  .sk-rail__card:focus-within :global(.skill-tip),
+  .sk-icons__card:hover :global(.skill-tip),
+  .sk-icons__card:focus-within :global(.skill-tip),
+  .sk-media__card:hover :global(.skill-tip),
+  .sk-media__card:focus-within :global(.skill-tip),
+  .sk-grouped__item:hover :global(.skill-tip),
+  .sk-grouped__item:focus-within :global(.skill-tip),
+  .sk-signal__node:hover :global(.skill-tip),
+  .sk-signal__node:focus-within :global(.skill-tip) {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
   }
 
-  @media (min-width: 768px) {
-    .skills-card:nth-child(-n + 3) .skills-card__tip {
-      bottom: auto;
-      top: calc(100% + 0.55rem);
-    }
+  /* 1 Rail */
+  .sk-rail {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
 
-    .skills-card:nth-child(-n + 3) .skills-card__tip::after {
-      top: auto;
-      bottom: 100%;
-      border-top-color: transparent;
-      border-bottom-color: #0e1a24;
+  @media (min-width: 768px) {
+    .sk-rail {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
+  .sk-rail__card {
+    position: relative;
+  }
+
+  .sk-rail__hit {
+    display: flex;
+    width: 100%;
+    min-height: 4.75rem;
+    flex-direction: column;
+    gap: 0.4rem;
+    border: none;
+    border-radius: 0.85rem;
+    border-left: 4px solid #108474;
+    background: #fff;
+    padding: 1rem 1rem 1rem 1.15rem;
+    text-align: left;
+    cursor: default;
+    box-shadow: 0 1px 0 rgba(17, 50, 75, 0.06);
+  }
+
+  .sk-rail__hit:hover,
+  .sk-rail__hit:focus-visible {
+    box-shadow: 0 8px 24px rgba(17, 50, 75, 0.12);
+  }
+
+  .sk-rail__group {
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #5a6b7a;
+  }
+
+  .sk-rail__name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #232e3a;
+  }
+
+  /* 3 Icons */
+  .sk-icons {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.65rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  @media (min-width: 768px) {
+    .sk-icons {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
+
+  .sk-icons__card {
+    position: relative;
+  }
+
+  .sk-icons__hit {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.45rem;
+    border: none;
+    border-radius: 1rem;
+    background: #fff;
+    padding: 1rem 0.6rem;
+    text-align: center;
+    cursor: default;
+    box-shadow: 0 1px 0 rgba(17, 50, 75, 0.06);
+  }
+
+  .sk-icons__hit:hover,
+  .sk-icons__hit:focus-visible {
+    box-shadow: 0 8px 22px rgba(17, 50, 75, 0.12);
+  }
+
+  .sk-icons__name {
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: #232e3a;
+  }
+
+  .sk-icons__group {
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #5a6b7a;
+  }
+
+  /* 4 Media */
+  .sk-media {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  @media (min-width: 768px) {
+    .sk-media {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .sk-media__card {
+    position: relative;
+  }
+
+  .sk-media__hit {
+    position: relative;
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    border: none;
+    border-radius: 0.9rem;
+    background: #0e1a24;
+    padding: 0;
+    cursor: default;
+    aspect-ratio: 16 / 10;
+  }
+
+  .sk-media__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+  }
+
+  .sk-media__shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 35%, rgba(5, 10, 18, 0.88) 100%);
+  }
+
+  .sk-media__label {
+    position: absolute;
+    left: 0.85rem;
+    right: 0.85rem;
+    bottom: 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    text-align: left;
+  }
+
+  .sk-media__group {
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #7eb8a8;
+  }
+
+  .sk-media__name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  /* 5 Grouped */
+  .sk-grouped {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem 1rem;
+  }
+
+  @media (min-width: 900px) {
+    .sk-grouped {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .sk-grouped__title {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.65rem;
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-secondary);
+  }
+
+  .sk-grouped__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sk-grouped__item {
+    position: relative;
+  }
+
+  .sk-grouped__hit {
+    display: block;
+    width: 100%;
+    border: none;
+    border-radius: 999px;
+    background: #fff;
+    padding: 0.55rem 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #232e3a;
+    text-align: left;
+    cursor: default;
+    box-shadow: 0 1px 0 rgba(17, 50, 75, 0.06);
+  }
+
+  .sk-grouped__hit:hover,
+  .sk-grouped__hit:focus-visible {
+    box-shadow: 0 6px 16px rgba(17, 50, 75, 0.1);
+  }
+
+  /* 6 Signal strip */
+  .sk-signal {
+    position: relative;
+    padding: 1.5rem 0 0.5rem;
+  }
+
+  .sk-signal__line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 2.15rem;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #108474 12%, #108474 88%, transparent);
+    opacity: 0.55;
+  }
+
+  .sk-signal__nodes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem 0.5rem;
+    justify-content: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sk-signal__node {
+    position: relative;
+  }
+
+  .sk-signal__hit {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.45rem;
+    border: none;
+    background: transparent;
+    padding: 0 0.35rem;
+    cursor: default;
+  }
+
+  .sk-signal__dot {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 999px;
+    background: #fff;
+    border: 2px solid #108474;
+    box-shadow: 0 0 0 4px rgba(16, 132, 116, 0.12);
+    transition:
+      background 0.15s ease,
+      transform 0.15s ease;
+  }
+
+  .sk-signal__hit:hover .sk-signal__dot,
+  .sk-signal__hit:focus-visible .sk-signal__dot {
+    background: #108474;
+    transform: scale(1.15);
+  }
+
+  .sk-signal__name {
+    max-width: 6.5rem;
+    border-radius: 999px;
+    background: #fff;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: #232e3a;
+    text-align: center;
+    box-shadow: 0 1px 0 rgba(17, 50, 75, 0.06);
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .skills-card__hit,
-    .skills-card__tip {
+    .skills-section :global(.skill-tip),
+    .sk-signal__dot {
       transition: none;
     }
   }

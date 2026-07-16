@@ -1,5 +1,5 @@
 ---
-// Type Takeover — Signal Beam photo + soft veil
+// Type Takeover — looping signal-net video + soft veil
 
 import hero from '../../content/hero/hero.json';
 
@@ -10,19 +10,28 @@ const roleParts = (() => {
   return [words.slice(0, -1).join(' '), words[words.length - 1]];
 })();
 
-const photo = '/images/hero/signal-net.png';
+const videoSrc = '/images/hero/signal-net.mp4';
+const posterSrc = '/images/hero/signal-net.png';
 ---
 
 <section class="tt1 relative min-h-[100dvh] overflow-hidden">
-  <!-- Back: photo + soft veil -->
+  <!-- Back: looping video + soft veil -->
   <div class="tt1__bg absolute inset-0" aria-hidden="true">
-    <img class="tt1__photo" src={photo} alt="" width="1024" height="571" decoding="async" />
+    <video
+      class="tt1__video"
+      src={videoSrc}
+      poster={posterSrc}
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="auto"
+    ></video>
     <div class="tt1__veil"></div>
   </div>
 
-  <!-- Mid: motion above photo, under text -->
+  <!-- Mid: motion above video, under text -->
   <div class="tt1__anim absolute inset-0" aria-hidden="true">
-    <div class="tt1__beam"></div>
     <div class="tt1__crest"></div>
     <span class="tt1__spark tt1__spark--a"></span>
     <span class="tt1__spark tt1__spark--b"></span>
@@ -70,6 +79,24 @@ const photo = '/images/hero/signal-net.png';
   </div>
 </section>
 
+<script>
+  // Pause looping hero video when reduced motion is preferred
+  function syncHeroVideo() {
+    const video = document.querySelector('.tt1__video');
+    if (!(video instanceof HTMLVideoElement)) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) {
+      video.pause();
+      video.removeAttribute('autoplay');
+    } else if (video.paused) {
+      video.play().catch(() => {});
+    }
+  }
+
+  syncHeroVideo();
+  document.addEventListener('astro:page-load', syncHeroVideo);
+</script>
+
 <style>
   .tt1 {
     background: #05070a;
@@ -90,7 +117,7 @@ const photo = '/images/hero/signal-net.png';
     font-weight: 700;
   }
 
-  .tt1__photo {
+  .tt1__video {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -113,26 +140,6 @@ const photo = '/images/hero/signal-net.png';
     z-index: 1;
     overflow: hidden;
     pointer-events: none;
-  }
-
-  /* Diagonal signal beam — full cross, then return */
-  .tt1__beam {
-    position: absolute;
-    top: -45%;
-    left: 0;
-    width: min(38vw, 22rem);
-    height: 190%;
-    background: linear-gradient(
-      105deg,
-      transparent 30%,
-      rgba(77, 214, 255, 0.06) 42%,
-      rgba(16, 132, 116, 0.28) 50%,
-      rgba(255, 200, 120, 0.1) 58%,
-      transparent 70%
-    );
-    transform: skewX(-20deg) translate3d(-55vw, 14vh, 0);
-    will-change: transform;
-    animation: tt1-beam 7s ease-in-out infinite alternate;
   }
 
   /* Soft glow riding the wave crest */
@@ -206,17 +213,6 @@ const photo = '/images/hero/signal-net.png';
     );
   }
 
-  @keyframes tt1-beam {
-    from {
-      transform: skewX(-20deg) translate3d(-55vw, 14vh, 0);
-      opacity: 0.55;
-    }
-    to {
-      transform: skewX(-20deg) translate3d(115vw, -14vh, 0);
-      opacity: 1;
-    }
-  }
-
   @keyframes tt1-crest {
     0%,
     100% {
@@ -246,15 +242,9 @@ const photo = '/images/hero/signal-net.png';
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .tt1__beam,
     .tt1__crest,
     .tt1__spark {
       animation: none;
-    }
-
-    .tt1__beam {
-      transform: skewX(-20deg) translate3d(30vw, 0, 0);
-      opacity: 0.7;
     }
 
     .tt1__crest {

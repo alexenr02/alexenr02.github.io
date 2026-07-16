@@ -1,0 +1,30 @@
+---
+// Shared terminal-style skill tip (usage + context image)
+
+interface Props {
+  id: string;
+  usage: string;
+  image: string;
+  class?: string;
+}
+
+const { id, usage, image, class: className } = Astro.props;
+---
+
+<div id={id} class:list={['skill-tip', className]} role="tooltip">
+  <div class="skill-tip__media">
+    <img
+      class="skill-tip__img"
+      src={image}
+      alt=""
+      width="640"
+      height="360"
+      decoding="async"
+      data-no-border
+    />
+  </div>
+  <div class="skill-tip__copy">
+    <p class="skill-tip__label">Industry usage</p>
+    <p class="skill-tip__body">{usage}</p>
+  </div>
+</div>
