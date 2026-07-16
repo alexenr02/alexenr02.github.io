@@ -1,21 +1,113 @@
 {
   "sectionTitle": "Skills",
   "highlights": [
-    { "name": "Embedded C", "group": "Lang" },
-    { "name": "C++", "group": "Lang" },
-    { "name": "Python", "group": "Lang" },
-    { "name": "Cortex-M4/M7", "group": "MCU" },
-    { "name": "embOS", "group": "RTOS" },
-    { "name": "MQX", "group": "RTOS" },
-    { "name": "FreeRTOS", "group": "RTOS" },
-    { "name": "CAN / J1939", "group": "Bus" },
-    { "name": "UART / SPI", "group": "Bus" },
-    { "name": "HIL", "group": "Method" },
-    { "name": "V-model", "group": "Method" },
-    { "name": "Bring-up", "group": "Method" },
-    { "name": "J-Link", "group": "Tool" },
-    { "name": "Kvaser / Peak", "group": "Tool" },
-    { "name": "Scope", "group": "Lab" },
-    { "name": "Git", "group": "Tool" }
+    {
+      "name": "Embedded C",
+      "group": "Lang",
+      "usage": "Bare-metal and RTOS firmware on MCUs \u2014 drivers, ISRs, and deterministic control loops in automotive, industrial, and appliance ECUs.",
+      "image": "/images/skills/lang.svg"
+    },
+    {
+      "name": "C++",
+      "group": "Lang",
+      "usage": "Structured firmware modules and state machines on Cortex-M platforms where encapsulation helps across multi-ECU product lines.",
+      "image": "/images/skills/lang.svg"
+    },
+    {
+      "name": "Python",
+      "group": "Lang",
+      "usage": "Build automation, HIL helpers, CAN tooling, and manufacturing scripts that cut flash/test cycle time on the production floor.",
+      "image": "/images/skills/lang.svg"
+    },
+    {
+      "name": "Cortex-M4/M7",
+      "group": "MCU",
+      "usage": "Control and connectivity ECUs in refrigeration, off-highway, and industrial machines \u2014 from bring-up through field diagnostics.",
+      "image": "/images/skills/mcu.svg"
+    },
+    {
+      "name": "embOS",
+      "group": "RTOS",
+      "usage": "Hard real-time tasking on Cortex-M4 refrigeration controllers, including watchdog and diagnostic services.",
+      "image": "/images/skills/rtos.svg"
+    },
+    {
+      "name": "MQX",
+      "group": "RTOS",
+      "usage": "Cross-generation firmware on Cortex-M7 targets where the same features must ship on an older RTOS stack.",
+      "image": "/images/skills/rtos.svg"
+    },
+    {
+      "name": "FreeRTOS",
+      "group": "RTOS",
+      "usage": "Portable task scheduling for IoT and industrial nodes when a lightweight, widely supported kernel is required.",
+      "image": "/images/skills/rtos.svg"
+    },
+    {
+      "name": "CAN / J1939",
+      "group": "Bus",
+      "usage": "Vehicle and machine networks \u2014 multi-ECU refrigeration, construction, and agriculture platforms exchanging commands and diagnostics.",
+      "image": "/images/skills/bus.svg"
+    },
+    {
+      "name": "UART / SPI",
+      "group": "Bus",
+      "usage": "Board bring-up, sensor links, flash programming, and debug channels during hardware validation and factory test.",
+      "image": "/images/skills/bus.svg"
+    },
+    {
+      "name": "BLE",
+      "group": "Bus",
+      "usage": "Short-range links for service apps, cabin/operator interfaces, and master\u2013slave modules on mobile equipment.",
+      "image": "/images/skills/bus.svg"
+    },
+    {
+      "name": "Wi\u2011Fi",
+      "group": "Bus",
+      "usage": "Field updates, telemetry, and connected diagnostics when machines need IP connectivity beyond the local CAN bus.",
+      "image": "/images/skills/bus.svg"
+    },
+    {
+      "name": "HIL",
+      "group": "Method",
+      "usage": "Hardware-in-the-loop benches that validate ECU behavior before vehicle or plant integration \u2014 catching faults off the critical path.",
+      "image": "/images/skills/method.svg"
+    },
+    {
+      "name": "V-model",
+      "group": "Method",
+      "usage": "Requirements-to-test traceability for regulated or safety-minded embedded programs across design and verification.",
+      "image": "/images/skills/method.svg"
+    },
+    {
+      "name": "Bring-up",
+      "group": "Method",
+      "usage": "First power-on of new boards \u2014 clocks, rails, peripherals, and boot paths until the prototype talks on the bus.",
+      "image": "/images/skills/method.svg"
+    },
+    {
+      "name": "J-Link",
+      "group": "Tool",
+      "usage": "Flash, breakpoint debug, and RTT-style visibility during firmware development and field failure analysis.",
+      "image": "/images/skills/tool.svg"
+    },
+    {
+      "name": "Kvaser / Peak",
+      "group": "Tool",
+      "usage": "CAN capture and injection for bus analysis, manufacturing activation sequences, and multi-ECU system debug.",
+      "image": "/images/skills/tool.svg"
+    },
+    {
+      "name": "Scope",
+      "group": "Lab",
+      "usage": "Signal integrity and timing checks on clocks, SPI, UART, and CAN edges when the software alone cannot explain the fault.",
+      "image": "/images/skills/lab.svg"
+    },
+    {
+      "name": "Git",
+      "group": "Tool",
+      "usage": "Branching, reviews, and release tagging across firmware families shared by multi-site engineering teams.",
+      "image": "/images/skills/tool.svg"
+    }
   ]
 }

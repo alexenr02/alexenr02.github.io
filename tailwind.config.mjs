@@ -7,10 +7,11 @@ export default {
 
   theme: {
     extend: {
-      // Font families - Geist Sans for body, Geist Mono for code
+      // DM Sans (Rokid-like) + mono for technical labels
       fontFamily: {
-        sans: ['Geist Sans', 'system-ui', 'sans-serif'],
+        sans: ['DM Sans', 'system-ui', 'sans-serif'],
         mono: ['Geist Mono', 'ui-monospace', 'monospace'],
+        cursive: ['Tangerine', 'cursive'],
       },
 
       // Custom colors using CSS variables for theme support
@@ -22,6 +23,10 @@ export default {
         accent: 'var(--color-accent)',
         border: 'var(--color-border)',
         card: 'var(--color-card-bg)',
+        navy: 'var(--color-navy)',
+        slate: 'var(--color-slate)',
+        mist: 'var(--color-mist)',
+        signal: 'var(--color-signal)',
       },
 
       // Typography scale using clamp for responsive sizing

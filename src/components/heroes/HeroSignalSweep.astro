@@ -1,0 +1,122 @@
+---
+// Hero 3 — Signal Sweep
+// Memorable CAN/scope sweep as the visual; name as brand mark
+
+import hero from '../../content/hero/hero.json';
+---
+
+<section
+  class="hero-3 relative min-h-[100dvh] overflow-hidden"
+  style="background: #0e1a24;"
+>
+  <div class="hero-3__scope absolute inset-0" aria-hidden="true">
+    <svg class="h-full w-full" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <pattern id="h3-grid" width="48" height="48" patternUnits="userSpaceOnUse">
+          <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#1e3344" stroke-width="0.8" />
+        </pattern>
+        <linearGradient id="h3-fade" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#108474" stop-opacity="0" />
+          <stop offset="20%" stop-color="#108474" stop-opacity="1" />
+          <stop offset="80%" stop-color="#c4dfff" stop-opacity="1" />
+          <stop offset="100%" stop-color="#c4dfff" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+      <rect width="1200" height="800" fill="url(#h3-grid)" />
+      <line x1="0" y1="400" x2="1200" y2="400" stroke="#2a4558" stroke-dasharray="6 10" />
+      <path
+        class="hero-3__wave"
+        fill="none"
+        stroke="url(#h3-fade)"
+        stroke-width="3"
+        stroke-linecap="round"
+        d="M0,400 C90,400 110,180 200,180 S320,620 420,620 S540,180 640,180 S760,620 860,620 S980,400 1080,400 S1160,400 1200,400"
+      />
+      <path
+        class="hero-3__wave hero-3__wave--b"
+        fill="none"
+        stroke="#ffd9c9"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        opacity="0.55"
+        d="M0,400 C90,400 110,620 200,620 S320,180 420,180 S540,620 640,620 S760,180 860,180 S980,400 1080,400 S1160,400 1200,400"
+      />
+      <text x="48" y="160" fill="#6a8aa0" font-family="Geist Mono, monospace" font-size="14" letter-spacing="3"
+        >CH1 · CAN_H</text
+      >
+      <text x="48" y="660" fill="#6a8aa0" font-family="Geist Mono, monospace" font-size="14" letter-spacing="3"
+        >CH2 · CAN_L</text
+      >
+    </svg>
+  </div>
+
+  <div
+    class="absolute inset-0 bg-gradient-to-r from-[#0e1a24] via-[#0e1a24]/75 to-transparent"
+    aria-hidden="true"
+  />
+
+  <div class="relative z-10 flex min-h-[100dvh] items-center px-4 py-24">
+    <div class="container mx-auto">
+      <div class="max-w-2xl">
+        <p class="mb-4 font-mono text-[11px] uppercase tracking-[0.28em] text-[#7eb8a8]">
+          {hero.subtitle}
+        </p>
+        <h1 class="mb-8 text-5xl font-bold leading-[0.95] tracking-tight text-white md:text-6xl lg:text-7xl">
+          {hero.name}
+        </h1>
+        <div class="flex flex-wrap gap-3">
+          <a
+            href={hero.primaryCta.href}
+            class="rounded-full bg-[#108474] px-7 py-3.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
+          >
+            {hero.primaryCta.label}
+          </a>
+          <a
+            href={hero.secondaryCta.href}
+            class="rounded-full border border-white/35 px-7 py-3.5 text-sm font-medium text-white transition-colors hover:border-white hover:bg-white/10"
+          >
+            {hero.secondaryCta.label}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero-3__wave {
+    stroke-dasharray: 1600;
+    stroke-dashoffset: 1600;
+    animation: h3-sweep 5s ease-in-out infinite;
+  }
+
+  .hero-3__wave--b {
+    animation-delay: 0.2s;
+  }
+
+  @keyframes h3-sweep {
+    0% {
+      stroke-dashoffset: 1600;
+      opacity: 0.4;
+    }
+    20% {
+      opacity: 1;
+    }
+    55% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+    }
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 0.6;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-3__wave {
+      animation: none;
+      stroke-dashoffset: 0;
+      opacity: 0.9;
+    }
+  }
+</style>

@@ -114,11 +114,30 @@ import { Menu, X } from 'lucide-svelte';
     min-width: 0;
   }
 
+  /* Over dark hero: light chrome until the bar becomes solid */
+  html[data-hero-surface='dark'] .site-nav:not(.is-scrolled) .site-nav__logo,
+  html[data-hero-surface='dark'] .site-nav:not(.is-scrolled) .site-nav__link,
+  html[data-hero-surface='dark'] .site-nav:not(.is-scrolled) .site-nav__menu-btn,
+  html[data-hero-surface='dark'] .site-nav:not(.is-scrolled) :global(.theme-toggle) {
+    color: rgba(255, 255, 255, 0.88);
+  }
+
+  html[data-hero-surface='dark'] .site-nav:not(.is-scrolled) .site-nav__link:hover,
+  html[data-hero-surface='dark'] .site-nav:not(.is-scrolled) .site-nav__logo:hover {
+    color: #ffffff;
+  }
+
+  html[data-hero-surface='dark'] .site-nav:not(.is-scrolled) .site-nav__menu-btn:hover,
+  html[data-hero-surface='dark'] .site-nav:not(.is-scrolled) :global(.theme-toggle:hover) {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
   .site-nav__link {
     color: var(--color-secondary);
   }
 
-  .site-nav__link:hover {
+  .site-nav.is-scrolled .site-nav__link:hover,
+  html[data-hero-surface='light'] .site-nav:not(.is-scrolled) .site-nav__link:hover {
     color: var(--color-text);
   }
 

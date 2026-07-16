@@ -1,6 +1,5 @@
 ---
-// Work Experience — Option A: compact rail; bullets behind <details>
-// Reads from src/content/experience/
+// Experience — Option A compact rail + Option B path pins, Rokid cards
 
 import { getCollection } from 'astro:content';
 
@@ -18,26 +17,24 @@ function formatRange(start: Date, end?: Date): string {
 
 <section id="experience" class="scroll-mt-[var(--nav-height)] py-section">
   <div class="container mx-auto px-4">
-    <h2 class="mb-10 text-3xl font-bold text-foreground md:text-4xl">Experience</h2>
+    <p class="mb-2 font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Path</p>
+    <h2 class="mb-10 text-3xl font-bold tracking-tight text-foreground md:text-4xl">Experience</h2>
 
-    <!-- Horizontal-feeling rail on desktop; stacked compact rows on mobile -->
-    <ol class="experience-rail relative space-y-0 border-l border-border md:border-l-0">
+    <ol class="experience-rail relative space-y-0">
       {
         sorted.map((entry, index) => (
           <li class="experience-rail__item relative pl-6 md:pl-0">
-            {/* Desktop connector between rows */}
             {index < sorted.length - 1 && (
               <div
-                class="absolute left-[0.2rem] top-10 bottom-0 w-px bg-border md:left-[2.35rem] md:top-14"
+                class="absolute left-[0.35rem] top-12 bottom-0 w-px bg-border md:left-[1.45rem]"
                 aria-hidden="true"
               />
             )}
 
             <div class="flex gap-4 pb-8 md:gap-6 md:pb-10">
-              {/* Logo / year mark */}
               <div class="relative z-[1] shrink-0">
                 {entry.data.logo ? (
-                  <div class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-md border border-border bg-white p-1 md:h-12 md:w-12">
+                  <div class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-border bg-white p-1 md:h-12 md:w-12">
                     <img
                       src={entry.data.logo}
                       alt={entry.data.logoAlt ?? `${entry.data.company} logo`}
@@ -47,13 +44,13 @@ function formatRange(start: Date, end?: Date): string {
                     />
                   </div>
                 ) : (
-                  <div class="flex h-10 w-10 items-center justify-center rounded-md border border-border bg-card font-mono text-xs text-secondary md:h-12 md:w-12">
+                  <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-mist font-mono text-xs text-secondary md:h-12 md:w-12">
                     {formatRange(entry.data.startDate, entry.data.endDate).slice(0, 2)}
                   </div>
                 )}
               </div>
 
-              <div class="min-w-0 flex-1">
+              <div class="min-w-0 flex-1 rounded-2xl bg-background p-5 md:p-6">
                 <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                   <h3 class="text-lg font-semibold text-foreground">{entry.data.position}</h3>
                   <span class="font-mono text-xs text-secondary">
@@ -67,7 +64,6 @@ function formatRange(start: Date, end?: Date): string {
                   )}
                 </p>
 
-                {/* Tech as a quiet mono row */}
                 {entry.data.technologies && entry.data.technologies.length > 0 && (
                   <p class="mt-2 font-mono text-xs leading-relaxed text-secondary">
                     {entry.data.technologies.slice(0, 6).join(' · ')}
@@ -76,13 +72,12 @@ function formatRange(start: Date, end?: Date): string {
                   </p>
                 )}
 
-                {/* Bullets only when expanded */}
                 {entry.data.responsibilities && entry.data.responsibilities.length > 0 && (
                   <details class="experience-details group mt-3">
-                    <summary class="cursor-pointer list-none font-mono text-xs uppercase tracking-wider text-secondary transition-colors hover:text-foreground">
+                    <summary class="cursor-pointer list-none font-mono text-[11px] uppercase tracking-[0.16em] text-signal transition-colors hover:text-primary">
                       <span class="inline-flex items-center gap-1.5">
                         <span
-                          class="experience-details__chevron inline-block transition-transform group-open:rotate-90"
+                          class="inline-block transition-transform group-open:rotate-90"
                           aria-hidden="true"
                         >
                           ▸
@@ -90,7 +85,7 @@ function formatRange(start: Date, end?: Date): string {
                         Highlights
                       </span>
                     </summary>
-                    <ul class="mt-3 space-y-2 border-l border-border pl-4">
+                    <ul class="mt-3 space-y-2 border-l-2 border-signal/30 pl-4">
                       {entry.data.responsibilities.map((item) => (
                         <li class="text-sm leading-relaxed text-secondary">{item}</li>
                       ))}

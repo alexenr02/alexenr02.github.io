@@ -1,0 +1,80 @@
+---
+// Skills marquee — Tangerine bold, RTL scroll, black bullet separators
+
+import skills from '../../content/skills/skills.json';
+
+const tickerSkills = skills.highlights.map((s) => s.name);
+const tickerLoop = [...tickerSkills, ...tickerSkills];
+---
+
+<div class="skills-marquee" aria-label="Skills">
+  <div class="skills-marquee__track">
+    {
+      tickerLoop.map((skill) => (
+        <span class="skills-marquee__item">{skill}</span>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .skills-marquee {
+    width: 100%;
+    overflow: hidden;
+    background: #ffffff;
+    padding: 0.95rem 0;
+    border-top: 1px solid color-mix(in srgb, #11324b 8%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, #11324b 8%, transparent);
+  }
+
+  .skills-marquee__track {
+    display: flex;
+    width: max-content;
+    animation: skills-marquee 40s linear infinite;
+  }
+
+  .skills-marquee__item {
+    flex-shrink: 0;
+    padding: 0 1.75rem;
+    font-family: 'Tangerine', cursive;
+    font-size: clamp(2.15rem, 3.5vw, 2.85rem);
+    font-weight: 700;
+    font-synthesis: none;
+    line-height: 1;
+    color: #0a0a0a;
+    white-space: nowrap;
+  }
+
+  .skills-marquee__item::after {
+    content: '•';
+    margin-left: 1.75rem;
+    color: #6b6b6b;
+    opacity: 1;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.75em;
+  }
+
+  @keyframes skills-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skills-marquee__track {
+      animation: none;
+      flex-wrap: wrap;
+      width: 100%;
+      justify-content: center;
+      row-gap: 0.35rem;
+    }
+
+    .skills-marquee__item:nth-child(n + 19) {
+      display: none;
+    }
+  }
+</style>

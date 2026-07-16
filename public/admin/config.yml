@@ -143,6 +143,13 @@ collections:
             fields:
               - { name: name, label: Skill name, widget: string }
               - { name: group, label: Group label (e.g. RTOS), widget: string }
+              - { name: usage, label: Industry usage (hover popup), widget: text }
+              - name: image
+                label: Context image
+                widget: image
+                media_folder: public/images/skills
+                public_folder: /images/skills
+                required: false
 
   # ---------------------------------------------------------------------------
   # Folder collection (one file per work experience entry)

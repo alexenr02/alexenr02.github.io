@@ -1,0 +1,71 @@
+---
+// Hero 1 — Product Stage
+// Chip as a product shot in a soft frame; name left (Rokid product-page feel)
+
+import ChipAnimation from '@components/common/ChipAnimation.svelte';
+import hero from '../../content/hero/hero.json';
+---
+
+<section
+  class="hero-1 relative min-h-[100dvh] overflow-hidden bg-mist"
+>
+  <div class="hero-1__wash absolute inset-0" aria-hidden="true"></div>
+
+  <div class="relative z-10 mx-auto grid min-h-[100dvh] max-w-6xl items-center gap-8 px-4 py-24 lg:grid-cols-2 lg:gap-12 lg:py-16">
+    <div class="text-center lg:text-left">
+      <p class="mb-4 font-mono text-[11px] uppercase tracking-[0.28em] text-secondary">
+        {hero.subtitle}
+      </p>
+      <h1 class="mb-6 text-5xl font-bold leading-[0.95] tracking-tight text-foreground md:text-6xl lg:text-7xl">
+        {hero.name}
+      </h1>
+      <p class="mb-8 max-w-md text-base text-secondary lg:mx-0 mx-auto">
+        Firmware from bring-up to production — owned end to end.
+      </p>
+      <div class="flex flex-wrap justify-center gap-3 lg:justify-start">
+        <a
+          href={hero.primaryCta.href}
+          class="rounded-full bg-primary px-7 py-3.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
+        >
+          {hero.primaryCta.label}
+        </a>
+        <a
+          href={hero.secondaryCta.href}
+          class="rounded-full border border-border bg-background px-7 py-3.5 text-sm font-medium text-foreground transition-colors hover:border-primary"
+        >
+          {hero.secondaryCta.label}
+        </a>
+      </div>
+    </div>
+
+    <!-- Product frame — chip sits on a navy stage like a SKU shot -->
+    <div class="hero-1__stage relative mx-auto w-full max-w-lg overflow-hidden rounded-[2rem] shadow-xl">
+      <div class="relative aspect-square bg-[#11324b]">
+        <ChipAnimation client:visible />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero-1__wash {
+    background: var(--gradient-soft);
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .hero-1__stage :global(.chip-animation) {
+    position: absolute !important;
+    inset: 0;
+    opacity: 1 !important;
+    background: transparent !important;
+  }
+
+  .hero-1__stage :global(.chip-animation__svg) {
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    transform: none !important;
+  }
+</style>

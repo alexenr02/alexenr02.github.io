@@ -18,14 +18,24 @@ interface Props {
   mainOffset?: boolean;
   /** URLs to prefetch in the background (e.g. ["/"] on project pages). */
   prefetch?: string[];
+  /** Hero surface for nav chrome: dark = light text over hero, light = dark text */
+  heroSurface?: 'dark' | 'light';
 }
 
-const { title, description, ogImage, canonical, noindex, mainOffset = true, prefetch } =
-  Astro.props;
+const {
+  title,
+  description,
+  ogImage,
+  canonical,
+  noindex,
+  mainOffset = true,
+  prefetch,
+  heroSurface = 'dark',
+} = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-hero-surface={heroSurface}>
   <head>
     <!-- Security headers via meta (GitHub Pages cannot set HTTP headers) -->
     <meta

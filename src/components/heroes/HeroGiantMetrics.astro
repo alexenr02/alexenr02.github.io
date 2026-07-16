@@ -1,0 +1,64 @@
+---
+// Hero 2 — Giant Metrics
+// Rokid-style oversized stats + name; chip as quiet ambient
+
+import ChipAnimation from '@components/common/ChipAnimation.svelte';
+import hero from '../../content/hero/hero.json';
+import about from '../../content/about/about.json';
+---
+
+<section
+  class="hero-2 relative min-h-[100dvh] overflow-hidden"
+  style="background: #11324b;"
+>
+  <div class="hero-2__wash absolute inset-0" aria-hidden="true"></div>
+  <div class="hero-2__chip pointer-events-none absolute inset-0 opacity-40" aria-hidden="true">
+    <ChipAnimation client:visible />
+  </div>
+
+  <div class="relative z-10 flex min-h-[100dvh] flex-col justify-end px-4 pb-16 pt-28 md:justify-center md:pb-20">
+    <div class="container mx-auto">
+      <p class="mb-3 font-mono text-[11px] uppercase tracking-[0.28em] text-white/50">
+        {hero.subtitle}
+      </p>
+      <h1 class="max-w-4xl text-5xl font-bold leading-[0.95] tracking-tight text-white md:text-7xl lg:text-8xl">
+        {hero.name}
+      </h1>
+
+      <div class="mt-10 grid max-w-3xl gap-3 sm:grid-cols-3">
+        {
+          about.metrics.map((metric) => (
+            <div class="rounded-2xl border border-white/15 bg-white/10 px-5 py-5 backdrop-blur-sm">
+              <p class="text-3xl font-bold tracking-tight text-white md:text-4xl">{metric.value}</p>
+              <p class="mt-1 text-sm text-white/65">{metric.label}</p>
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a
+          href={hero.primaryCta.href}
+          class="rounded-full bg-white px-7 py-3.5 text-sm font-medium text-[#11324b] transition-colors hover:bg-white/90"
+        >
+          {hero.primaryCta.label}
+        </a>
+        <a
+          href={hero.secondaryCta.href}
+          class="rounded-full border border-white/40 px-7 py-3.5 text-sm font-medium text-white transition-colors hover:border-white hover:bg-white/10"
+        >
+          {hero.secondaryCta.label}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero-2__wash {
+    background:
+      radial-gradient(ellipse 70% 50% at 80% 30%, rgba(196, 223, 255, 0.22) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 15% 85%, rgba(255, 217, 201, 0.14) 0%, transparent 50%);
+    pointer-events: none;
+  }
+</style>

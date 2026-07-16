@@ -1,154 +1,211 @@
 ---
-// Option B: Stack — protocol / firmware stack diagram (not skill pills)
+// Skills — Accent rail + Terminal tips with context images
 
-const layers = [
-  {
-    id: 'app',
-    label: 'Application',
-    items: ['Watchdogs', 'Actuation', 'Diagnostics', 'Build tooling'],
-  },
-  {
-    id: 'rtos',
-    label: 'RTOS',
-    items: ['embOS', 'MQX', 'FreeRTOS'],
-  },
-  {
-    id: 'bus',
-    label: 'Bus & I/O',
-    items: ['CAN', 'J1939', 'UART', 'SPI', 'RS-232'],
-  },
-  {
-    id: 'mcu',
-    label: 'MCU',
-    items: ['Cortex-M4', 'Cortex-M7', 'PIC18', 'PIC32'],
-  },
-  {
-    id: 'lang',
-    label: 'Languages',
-    items: ['Embedded C', 'C++', 'Python'],
-  },
-  {
-    id: 'method',
-    label: 'Method',
-    items: ['V-model', 'HIL', 'Bring-up', 'Traceability'],
-  },
-];
+import skills from '../../content/skills/skills.json';
+
+function tipId(name: string) {
+  return `skill-tip-${name.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`;
+}
 ---
 
-<section id="stack" class="stack-section scroll-mt-[var(--nav-height)] border-y border-border bg-card py-section">
+<section id="skills" class="skills-section scroll-mt-[var(--nav-height)] py-section">
   <div class="container mx-auto px-4">
-    <div class="mb-3 flex items-center gap-3">
-      <span class="font-mono text-xs uppercase tracking-[0.2em] text-secondary">CH2</span>
-      <h2 class="text-3xl font-bold text-foreground md:text-4xl">Stack</h2>
-    </div>
-    <p class="mb-10 max-w-lg text-secondary">
-      How the work layers — from silicon up to the systems that ship.
-    </p>
+    <p class="mb-2 font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Stack</p>
+    <h2 class="mb-8 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+      {skills.sectionTitle}
+    </h2>
 
-    <div class="stack-diagram mx-auto max-w-2xl" role="list">
+    <ul class="skills-grid">
       {
-        layers.map((layer, i) => (
-          <div class="stack-layer" role="listitem" style={`--i: ${i}`}>
-            <div class="stack-layer__rail" aria-hidden="true">
-              <span class="stack-layer__tick" />
-            </div>
-            <div class="stack-layer__panel">
-              <p class="stack-layer__label">{layer.label}</p>
-              <div class="stack-layer__items">
-                {layer.items.map((item) => (
-                  <span class="stack-layer__item">{item}</span>
-                ))}
+        skills.highlights.map((item) => (
+          <li class="skills-card">
+            <button type="button" class="skills-card__hit" aria-describedby={tipId(item.name)}>
+              <span class="skills-card__group">{item.group}</span>
+              <span class="skills-card__name">{item.name}</span>
+            </button>
+            <div id={tipId(item.name)} class="skills-card__tip" role="tooltip">
+              <div class="skills-card__tip-media">
+                <img
+                  class="skills-card__tip-img"
+                  src={item.image}
+                  alt=""
+                  width="640"
+                  height="360"
+                  decoding="async"
+                  data-no-border
+                />
+              </div>
+              <div class="skills-card__tip-copy">
+                <p class="skills-card__tip-label">Industry usage</p>
+                <p class="skills-card__tip-body">{item.usage}</p>
               </div>
             </div>
-          </div>
+          </li>
         ))
       }
-    </div>
+    </ul>
   </div>
 </section>
 
 <style>
-  .stack-diagram {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-  }
-
-  .stack-layer {
+  .skills-grid {
     display: grid;
-    grid-template-columns: 1.25rem 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.75rem;
-    align-items: stretch;
   }
 
-  .stack-layer__rail {
+  @media (min-width: 768px) {
+    .skills-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .skills-card {
     position: relative;
-    display: flex;
-    justify-content: center;
   }
 
-  .stack-layer__rail::before {
+  .skills-card__hit {
+    display: flex;
+    width: 100%;
+    min-height: 4.75rem;
+    flex-direction: column;
+    gap: 0.4rem;
+    border: none;
+    border-radius: 0.85rem;
+    border-left: 4px solid #108474;
+    background: #fff;
+    padding: 1rem 1rem 1rem 1.15rem;
+    text-align: left;
+    cursor: default;
+    box-shadow: 0 1px 0 rgba(17, 50, 75, 0.06);
+    transition:
+      box-shadow 0.18s ease,
+      transform 0.18s ease;
+  }
+
+  .skills-card__hit:hover,
+  .skills-card__hit:focus-visible {
+    box-shadow: 0 8px 24px rgba(17, 50, 75, 0.12);
+    transform: translateY(-1px);
+  }
+
+  .skills-card__hit:focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  .skills-card__group {
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #5a6b7a;
+  }
+
+  .skills-card__name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--color-text);
+  }
+
+  .skills-card__tip {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 0.55rem);
+    z-index: 30;
+    width: min(18.5rem, calc(100vw - 2rem));
+    overflow: hidden;
+    border-radius: 0.35rem;
+    border: 1px solid #2a4558;
+    background: #0e1a24;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px);
+    transition:
+      opacity 0.16s ease,
+      transform 0.16s ease,
+      visibility 0.16s ease;
+    pointer-events: none;
+  }
+
+  .skills-card__tip::after {
     content: '';
     position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: var(--color-signal, #c4892a);
-    opacity: 0.55;
+    left: 1.25rem;
+    top: 100%;
+    border: 6px solid transparent;
+    border-top-color: #0e1a24;
   }
 
-  .stack-layer__tick {
-    position: relative;
-    z-index: 1;
-    align-self: center;
-    width: 0.65rem;
-    height: 0.65rem;
-    border: 2px solid var(--color-signal, #c4892a);
-    background: var(--color-card-bg);
-    transform: rotate(45deg);
+  .skills-card__tip-media {
+    background: #0e1a24;
+    border-bottom: 1px solid #2a4558;
   }
 
-  .stack-layer__panel {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.65rem 1rem;
-    border: 1px solid var(--color-border);
-    background: var(--color-bg);
-    padding: 0.85rem 1rem;
-    /* Width steps like a schematic block stack */
-    margin-left: calc(var(--i) * 0.35rem);
-    margin-right: calc((5 - var(--i)) * 0.35rem);
+  .skills-card__tip-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+    object-position: center;
   }
 
-  .stack-layer__label {
-    flex: 0 0 auto;
-    min-width: 6.5rem;
+  .skills-card__tip-copy {
+    padding: 0.75rem 0.9rem 0.9rem;
+  }
+
+  .skills-card__tip-label {
+    margin-bottom: 0.35rem;
     font-family: 'Geist Mono', ui-monospace, monospace;
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--color-signal, #c4892a);
+    color: #7eb8a8;
   }
 
-  .stack-layer__items {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
+  .skills-card__tip-label::before {
+    content: '> ';
   }
 
-  .stack-layer__item {
+  .skills-card__tip-body {
     font-family: 'Geist Mono', ui-monospace, monospace;
-    font-size: 0.75rem;
-    color: var(--color-text);
-    border-bottom: 1px solid color-mix(in srgb, var(--color-signal, #c4892a) 35%, transparent);
-    padding-bottom: 1px;
+    font-size: 0.72rem;
+    line-height: 1.45;
+    color: #c4dfff;
   }
 
-  @media (max-width: 640px) {
-    .stack-layer__panel {
-      margin-left: 0;
-      margin-right: 0;
+  .skills-card:hover .skills-card__tip,
+  .skills-card:focus-within .skills-card__tip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  @media (min-width: 768px) {
+    .skills-card:nth-child(-n + 3) .skills-card__tip {
+      bottom: auto;
+      top: calc(100% + 0.55rem);
+    }
+
+    .skills-card:nth-child(-n + 3) .skills-card__tip::after {
+      top: auto;
+      bottom: 100%;
+      border-top-color: transparent;
+      border-bottom-color: #0e1a24;
+    }
+  }
+
+  [data-theme='dark'] .skills-card__hit {
+    background: var(--color-card-bg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skills-card__hit,
+    .skills-card__tip {
+      transition: none;
     }
   }
 </style>

@@ -1,0 +1,51 @@
+---
+// 3 — Soft Wash Navy: Type Takeover with stronger Orbit blue→peach wash
+
+import ChipAnimation from '@components/common/ChipAnimation.svelte';
+import hero from '../../content/hero/hero.json';
+
+const parts = hero.name.split(' ');
+const first = parts[0] ?? hero.name;
+const rest = parts.slice(1).join(' ');
+---
+
+<section class="tt3 relative min-h-[100dvh] overflow-hidden" style="background: #11324b;">
+  <div class="absolute inset-0 opacity-40" aria-hidden="true">
+    <ChipAnimation client:visible />
+  </div>
+  <div class="tt3__wash absolute inset-0" aria-hidden="true"></div>
+
+  <div class="relative z-10 flex min-h-[100dvh] flex-col justify-between px-4 py-28 md:py-24">
+    <div class="container mx-auto flex flex-1 flex-col justify-center">
+      <p class="mb-4 font-mono text-[11px] uppercase tracking-[0.28em] text-[#c4dfff]/80 md:mb-6">
+        {hero.subtitle}
+      </p>
+      <h1 class="tt3__title font-bold tracking-tight text-white">
+        <span class="block">{first}</span>
+        {rest && <span class="block text-[#ffd9c9]/90">{rest}</span>}
+      </h1>
+    </div>
+
+    <div class="container mx-auto flex flex-wrap items-end justify-between gap-6 pt-8">
+      <p class="max-w-sm text-sm text-white/60">Embedded problems, owned end-to-end.</p>
+      <div class="flex flex-wrap gap-3">
+        <a href={hero.primaryCta.href} class="rounded-full bg-white px-7 py-3.5 text-sm font-medium text-[#11324b] hover:bg-white/90">{hero.primaryCta.label}</a>
+        <a href={hero.secondaryCta.href} class="rounded-full border border-white/40 px-7 py-3.5 text-sm font-medium text-white hover:bg-white/10">{hero.secondaryCta.label}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .tt3__title {
+    font-size: clamp(3.5rem, 14vw, 9.5rem);
+    line-height: 0.88;
+  }
+  .tt3__wash {
+    background:
+      linear-gradient(135deg, rgba(196, 223, 255, 0.35) 0%, transparent 45%),
+      linear-gradient(315deg, rgba(255, 217, 201, 0.28) 0%, transparent 40%),
+      linear-gradient(180deg, transparent 40%, rgba(17, 50, 75, 0.85) 100%);
+    pointer-events: none;
+  }
+</style>

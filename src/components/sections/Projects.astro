@@ -1,5 +1,5 @@
 ---
-// Option C: gallery — large covers, title + tech only
+// Projects — Option A image mosaic + light Option B glyph, Rokid cards
 
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
@@ -11,69 +11,87 @@ const projects = all.sort((a, b) => {
   if (orderDiff !== 0) return orderDiff;
   return b.data.date.getTime() - a.data.date.getTime();
 });
+
+function oneLine(text: string, max = 88): string {
+  const cleaned = text.replace(/\s+/g, ' ').trim();
+  if (cleaned.length <= max) return cleaned;
+  return cleaned.slice(0, max).replace(/\s+\S*$/, '') + '…';
+}
 ---
 
-<section id="work" class="scroll-mt-[var(--nav-height)] py-8 md:py-12">
+<section id="projects" class="scroll-mt-[var(--nav-height)] py-section">
   <div class="container mx-auto px-4">
-    <h2 class="sr-only">Work</h2>
+    <p class="mb-2 font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Work</p>
+    <h2 class="mb-10 text-3xl font-bold tracking-tight text-foreground md:text-4xl">Projects</h2>
 
     {
       projects.length === 0 ? (
         <p class="text-lg text-secondary">Projects coming soon.</p>
       ) : (
-        <ul class="gallery flex flex-col gap-6 md:gap-8">
-          {projects.map((project, index) => (
-            <li>
-              <a
-                href={`/projects/${project.slug}`}
-                class:list={[
-                  'gallery__item group relative block overflow-hidden',
-                  index === 0 ? 'min-h-[70vh] md:min-h-[78vh]' : 'min-h-[55vh] md:min-h-[62vh]',
-                ]}
-              >
-                {project.data.thumbnail ? (
-                  <Image
-                    src={project.data.thumbnail}
-                    alt=""
-                    width={1600}
-                    height={900}
-                    class="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                    data-no-border
-                    loading={index === 0 ? 'eager' : 'lazy'}
-                  />
-                ) : (
-                  <div class="absolute inset-0 bg-gradient-to-br from-neutral-800 to-neutral-950" />
-                )}
-
-                <div
-                  class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/10"
-                  aria-hidden="true"
+        <div class="grid gap-5 md:grid-cols-2">
+          {projects.map((project) => (
+            <a
+              href={`/projects/${project.slug}`}
+              class="group relative flex min-h-[18rem] flex-col overflow-hidden rounded-2xl bg-background shadow-sm transition-shadow hover:shadow-lg md:min-h-[22rem]"
+            >
+              {project.data.thumbnail ? (
+                <Image
+                  src={project.data.thumbnail}
+                  alt=""
+                  width={960}
+                  height={540}
+                  class="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+                  data-no-border
                 />
+              ) : (
+                <div
+                  class="absolute inset-0"
+                  style="background: var(--gradient-soft);"
+                />
+              )}
 
-                <div class="absolute inset-0 flex flex-col justify-end p-6 md:p-10">
-                  <p class="font-mono text-[11px] uppercase tracking-[0.22em] text-white/65">
-                    {project.data.category}
-                  </p>
-                  <h3 class="mt-2 max-w-3xl text-3xl font-semibold tracking-tight text-white md:text-5xl">
-                    {project.data.title}
-                  </h3>
-                  <p class="mt-3 flex flex-wrap gap-x-3 gap-y-1 font-mono text-xs text-white/70 md:text-sm">
-                    {project.data.techStack.slice(0, 5).map((tech) => (
-                      <span>{tech}</span>
-                    ))}
-                  </p>
-                </div>
-              </a>
-            </li>
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-[#11324b]/90 via-[#11324b]/35 to-transparent"
+                aria-hidden="true"
+              />
+
+              <div
+                class="absolute right-4 top-4 text-white/80 opacity-80"
+                aria-hidden="true"
+              >
+                {project.data.category === 'Embedded' ? (
+                  <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+                    <rect x="10" y="10" width="20" height="20" stroke="currentColor" stroke-width="1.5" />
+                    <path
+                      d="M10 16H4M10 20H2M10 24H4M30 16H36M30 20H38M30 24H36M16 10V4M20 10V2M24 10V4M16 30V36M20 30V38M24 30V36"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                    />
+                  </svg>
+                ) : (
+                  <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+                    <path d="M8 10H32V30H8V10Z" stroke="currentColor" stroke-width="1.5" />
+                    <path d="M12 16H22M12 20H28M12 24H18" stroke="currentColor" stroke-width="1.5" />
+                  </svg>
+                )}
+              </div>
+
+              <div class="relative mt-auto flex flex-col gap-2 p-5 md:p-7">
+                <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-white/65">
+                  {project.data.category}
+                </span>
+                <h3 class="text-xl font-semibold text-white md:text-2xl">{project.data.title}</h3>
+                <p class="text-sm leading-snug text-white/75">
+                  {oneLine(project.data.description)}
+                </p>
+                <span class="mt-1 font-mono text-[11px] uppercase tracking-[0.16em] text-[#c4dfff]">
+                  View case study →
+                </span>
+              </div>
+            </a>
           ))}
-        </ul>
+        </div>
       )
     }
   </div>
 </section>
-
-<style>
-  .gallery__item {
-    background: #111;
-  }
-</style>

@@ -1,0 +1,63 @@
+---
+// 4 — Orbit Chip: Type Takeover copy + Orbit-style circular chip stage
+
+import ChipAnimation from '@components/common/ChipAnimation.svelte';
+import hero from '../../content/hero/hero.json';
+
+const parts = hero.name.split(' ');
+const first = parts[0] ?? hero.name;
+const rest = parts.slice(1).join(' ');
+---
+
+<section class="tt4 relative min-h-[100dvh] overflow-hidden bg-mist">
+  <div class="tt4__wash absolute inset-0" aria-hidden="true"></div>
+
+  <div class="relative z-10 mx-auto grid min-h-[100dvh] max-w-6xl items-center gap-8 px-4 py-28 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12 lg:py-20">
+    <div class="flex flex-col justify-between self-stretch py-4">
+      <div class="flex flex-1 flex-col justify-center">
+        <p class="mb-4 font-mono text-[11px] uppercase tracking-[0.28em] text-secondary">
+          {hero.subtitle}
+        </p>
+        <h1 class="tt4__title font-bold tracking-tight text-foreground">
+          <span class="block">{first}</span>
+          {rest && <span class="block text-primary/85">{rest}</span>}
+        </h1>
+      </div>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href={hero.primaryCta.href} class="rounded-full bg-primary px-7 py-3.5 text-sm font-medium text-white hover:opacity-90">{hero.primaryCta.label}</a>
+        <a href={hero.secondaryCta.href} class="rounded-full border border-border bg-background px-7 py-3.5 text-sm font-medium text-foreground hover:border-primary">{hero.secondaryCta.label}</a>
+      </div>
+    </div>
+
+    <div class="relative mx-auto aspect-square w-[min(100%,22rem)] overflow-hidden rounded-full shadow-2xl md:w-[26rem]">
+      <div class="absolute inset-0 bg-[#11324b]">
+        <ChipAnimation client:visible />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .tt4__title {
+    font-size: clamp(3rem, 11vw, 7.5rem);
+    line-height: 0.9;
+  }
+  .tt4__wash {
+    background: var(--gradient-soft);
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  .tt4 :global(.chip-animation) {
+    position: absolute !important;
+    inset: 0;
+    opacity: 1 !important;
+    background: transparent !important;
+  }
+  .tt4 :global(.chip-animation__svg) {
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    transform: none !important;
+  }
+</style>

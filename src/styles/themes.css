@@ -1,43 +1,50 @@
-/* Theme CSS Variables
-   Light theme is the default, dark theme activated via data-theme="dark"
-   Option C — gallery: paper walls, ink type, quiet accent */
+/* Theme — Orbit Bench page surfaces (mist + soft wash)
+   Hero stays Type Takeover (navy); rest of page uses mist */
 
 :root {
-  /* Fixed navbar height — keep in sync with Navbar.astro */
   --nav-height: 4rem;
 
-  --color-bg: #f7f7f5;
-  --color-text: #141414;
-  --color-primary: #2a2a2a;
-  --color-secondary: #6b6b6b;
-  --color-accent: #b45309;
-  --color-signal: #b45309;
-  --color-border: #e4e4e0;
-  --color-card-bg: #efefec;
+  /* Orbit Bench page colors */
+  --color-bg: #f2f4f4;
+  --color-text: #232e3a;
+  --color-primary: #11324b;
+  --color-secondary: #5a6b7a;
+  --color-accent: #108474;
+  --color-signal: #108474;
+  --color-border: #dde3ea;
+  --color-card-bg: #ffffff;
 
-  --color-focus: #2a2a2a;
+  --gradient-soft: linear-gradient(92deg, #c4dfff 0%, #ffd9c9 100%);
+  --color-navy: #11324b;
+  --color-slate: #232e3a;
+  --color-mist: #f2f4f4;
+
+  --color-focus: #11324b;
 }
 
 [data-theme='dark'] {
-  --color-bg: #0f0f0f;
-  --color-text: #f2f2f0;
-  --color-primary: #d4d4d0;
-  --color-secondary: #9a9a96;
-  --color-accent: #d97706;
-  --color-signal: #d97706;
-  --color-border: #2a2a2a;
-  --color-card-bg: #1a1a1a;
+  --color-bg: #121820;
+  --color-text: #f2f4f4;
+  --color-primary: #7eb8d4;
+  --color-secondary: #9aabba;
+  --color-accent: #3db8a0;
+  --color-signal: #3db8a0;
+  --color-border: #2a3540;
+  --color-card-bg: #1a222c;
 
-  --color-focus: #d4d4d0;
+  --gradient-soft: linear-gradient(92deg, #34557b 0%, #6b4a3a 100%);
+  --color-navy: #c4dfff;
+  --color-slate: #f2f4f4;
+  --color-mist: #121820;
+
+  --color-focus: #7eb8d4;
 }
 
-/* Dark mode image styling - add subtle border/shadow */
 [data-theme='dark'] img:not([data-no-border]) {
   border: 1px solid var(--color-border);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* High contrast support for accessibility */
 @media (prefers-contrast: high) {
   :root {
     --color-border: #000000;
@@ -61,4 +68,24 @@ html {
   transition:
     background-color 200ms ease,
     color 200ms ease;
+}
+
+/* Soft Orbit wash behind page content (below hero) */
+.page-orbit-wash {
+  position: relative;
+}
+
+.page-orbit-wash::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-soft);
+  opacity: 0.22;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page-orbit-wash > * {
+  position: relative;
+  z-index: 1;
 }

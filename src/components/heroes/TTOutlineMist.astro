@@ -1,0 +1,47 @@
+---
+// 7 — Outline Mist: stroke type on Orbit wash (light, page-matched)
+
+import hero from '../../content/hero/hero.json';
+
+const parts = hero.name.split(' ');
+const first = parts[0] ?? hero.name;
+const rest = parts.slice(1).join(' ');
+---
+
+<section class="tt7 relative min-h-[100dvh] overflow-hidden bg-mist">
+  <div class="tt7__wash absolute inset-0" aria-hidden="true"></div>
+
+  <div class="relative z-10 flex min-h-[100dvh] flex-col justify-between px-4 py-28 md:py-24">
+    <div class="container mx-auto flex flex-1 flex-col justify-center">
+      <p class="mb-4 font-mono text-[11px] uppercase tracking-[0.28em] text-secondary md:mb-6">
+        {hero.subtitle}
+      </p>
+      <h1 class="tt7__title font-bold tracking-tight">
+        <span class="block">{first}</span>
+        {rest && <span class="block">{rest}</span>}
+      </h1>
+    </div>
+
+    <div class="container mx-auto flex flex-wrap items-end justify-between gap-6 pt-8">
+      <p class="max-w-sm text-sm text-secondary">Embedded problems, owned end-to-end.</p>
+      <div class="flex flex-wrap gap-3">
+        <a href={hero.primaryCta.href} class="rounded-full bg-primary px-7 py-3.5 text-sm font-medium text-white hover:opacity-90">{hero.primaryCta.label}</a>
+        <a href={hero.secondaryCta.href} class="rounded-full border border-border bg-background px-7 py-3.5 text-sm font-medium text-foreground hover:border-primary">{hero.secondaryCta.label}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .tt7__title {
+    font-size: clamp(3.5rem, 14vw, 9.5rem);
+    line-height: 0.88;
+    color: transparent;
+    -webkit-text-stroke: 1.5px #11324b;
+  }
+  .tt7__wash {
+    background: var(--gradient-soft);
+    opacity: 0.45;
+    pointer-events: none;
+  }
+</style>

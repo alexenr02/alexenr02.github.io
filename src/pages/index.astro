@@ -1,75 +1,32 @@
 ---
-// Homepage — Option C: Gallery portfolio
-// Projects lead; about is a thin band; resume holds the rest
+// Homepage — Type Takeover hero experiments + Orbit Bench page colors
 
 import BaseLayout from '@layouts/BaseLayout.astro';
 import About from '@components/sections/About.astro';
+import Skills from '@components/sections/Skills.astro';
+import WorkExperience from '@components/sections/WorkExperience.astro';
 import Projects from '@components/sections/Projects.astro';
 import Contact from '@components/sections/Contact.astro';
-import ChipAnimation from '@components/common/ChipAnimation.svelte';
-import { getCollection } from 'astro:content';
-import { Image } from 'astro:assets';
-import hero from '../content/hero/hero.json';
-
-const featured = (
-  await getCollection('projects', ({ data }) => !data.draft && !data.archived && data.featured)
-).sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99))[0];
-
-const heroThumb = featured?.data.thumbnail;
+import SignalDivider from '@components/common/SignalDivider.astro';
+import SkillsMarquee from '@components/common/SkillsMarquee.astro';
+import HeroExperiments from '@components/heroes/HeroExperiments.astro';
 ---
 
-<BaseLayout>
-  <!-- Full-bleed hero: project still when available, chip as ambient fallback -->
-  <section
-    id="home"
-    class="relative min-h-[100dvh] scroll-mt-[var(--nav-height)] overflow-hidden bg-black"
-  >
-    {
-      heroThumb ? (
-        <Image
-          src={heroThumb}
-          alt=""
-          width={1920}
-          height={1080}
-          class="absolute inset-0 h-full w-full object-cover object-top"
-          data-no-border
-          loading="eager"
-          fetchpriority="high"
-        />
-      ) : (
-        <ChipAnimation client:visible />
-      )
-    }
+<BaseLayout heroSurface="dark">
+  <HeroExperiments />
 
-    <div
-      class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-black/25"
-      aria-hidden="true"
-    />
+  <SkillsMarquee />
 
-    <div class="relative z-10 flex min-h-[100dvh] items-end px-4 pb-16 pt-28 md:items-center md:pb-24">
-      <div class="container mx-auto">
-        <div class="max-w-3xl">
-          <h1 class="text-5xl font-bold tracking-tight text-white sm:text-6xl md:text-7xl lg:text-8xl">
-            {hero.name}
-          </h1>
-          <p class="mt-4 font-mono text-sm uppercase tracking-[0.22em] text-white/70 md:text-base">
-            {hero.subtitle}
-          </p>
-          <div class="mt-8">
-            <a
-              href={hero.primaryCta.href}
-              class="inline-flex items-center gap-2 border border-white bg-white px-7 py-3.5 text-sm font-medium tracking-wide text-black transition-colors hover:bg-transparent hover:text-white"
-            >
-              {hero.primaryCta.label}
-              <span aria-hidden="true">↓</span>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <Projects />
-  <About />
-  <Contact />
+  <div class="page-orbit-wash">
+    <SignalDivider label="ABOUT" />
+    <About />
+    <SignalDivider label="SKILLS" />
+    <Skills />
+    <SignalDivider label="EXPERIENCE" />
+    <WorkExperience />
+    <SignalDivider label="PROJECTS" />
+    <Projects />
+    <SignalDivider label="CONTACT" />
+    <Contact />
+  </div>
 </BaseLayout>

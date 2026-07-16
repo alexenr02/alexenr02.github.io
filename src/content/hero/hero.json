@@ -5,11 +5,11 @@
   "workspaceImage": "/images/hero/workspace.svg",
   "workspaceImageAlt": "Embedded software workspace with development board, debugger, and laptop",
   "primaryCta": {
-    "label": "Work",
-    "href": "#work"
+    "label": "Get in Touch",
+    "href": "#contact"
   },
   "secondaryCta": {
     "label": "View Projects",
-    "href": "#work"
+    "href": "#projects"
   }
 }

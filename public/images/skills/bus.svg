@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360">
+  <!-- Bus / network context — dual-wire trunk with ECU drops -->
+  <rect width="640" height="360" fill="#0e1a24"/>
+
+  <!-- subtle grid -->
+  <g stroke="#152230" stroke-width="1">
+    <line x1="0" y1="90" x2="640" y2="90"/>
+    <line x1="0" y1="180" x2="640" y2="180"/>
+    <line x1="0" y1="270" x2="640" y2="270"/>
+    <line x1="160" y1="0" x2="160" y2="360"/>
+    <line x1="320" y1="0" x2="320" y2="360"/>
+    <line x1="480" y1="0" x2="480" y2="360"/>
+  </g>
+
+  <!-- channel labels -->
+  <rect x="24" y="28" width="54" height="14" rx="2" fill="#108474"/>
+  <rect x="86" y="28" width="54" height="14" rx="2" fill="#ffd9c9"/>
+
+  <!-- CAN_H rail -->
+  <line x1="40" y1="120" x2="600" y2="120" stroke="#108474" stroke-width="4" stroke-linecap="round"/>
+  <!-- CAN_L rail -->
+  <line x1="40" y1="156" x2="600" y2="156" stroke="#ffd9c9" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- termination resistors -->
+  <rect x="28" y="126" width="12" height="24" rx="1" fill="#2a4558" stroke="#7eb8a8" stroke-width="1.5"/>
+  <rect x="600" y="126" width="12" height="24" rx="1" fill="#2a4558" stroke="#7eb8a8" stroke-width="1.5"/>
+
+  <!-- differential pulse glyph on the bus -->
+  <path d="M200 120 L220 120 L230 96 L250 144 L270 120 L290 120" fill="none" stroke="#c4dfff" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M200 156 L220 156 L230 180 L250 132 L270 156 L290 156" fill="none" stroke="#7eb8a8" stroke-width="1.75" stroke-linejoin="round" opacity="0.9"/>
+
+  <!-- ECU nodes hanging off the trunk -->
+  <g>
+    <!-- drop stubs -->
+    <line x1="120" y1="156" x2="120" y2="220" stroke="#2a4558" stroke-width="2"/>
+    <line x1="260" y1="156" x2="260" y2="220" stroke="#2a4558" stroke-width="2"/>
+    <line x1="400" y1="156" x2="400" y2="220" stroke="#2a4558" stroke-width="2"/>
+    <line x1="540" y1="156" x2="540" y2="220" stroke="#2a4558" stroke-width="2"/>
+
+    <!-- node boards -->
+    <rect x="78" y="220" width="84" height="72" rx="6" fill="#162636" stroke="#c4dfff" stroke-width="2"/>
+    <rect x="218" y="220" width="84" height="72" rx="6" fill="#162636" stroke="#c4dfff" stroke-width="2"/>
+    <rect x="358" y="220" width="84" height="72" rx="6" fill="#162636" stroke="#c4dfff" stroke-width="2"/>
+    <rect x="498" y="220" width="84" height="72" rx="6" fill="#11324b" stroke="#108474" stroke-width="2"/>
+
+    <!-- chip dies -->
+    <rect x="100" y="240" width="40" height="28" fill="#0e1a24" stroke="#5a8aa0" stroke-width="1.5"/>
+    <rect x="240" y="240" width="40" height="28" fill="#0e1a24" stroke="#5a8aa0" stroke-width="1.5"/>
+    <rect x="380" y="240" width="40" height="28" fill="#0e1a24" stroke="#5a8aa0" stroke-width="1.5"/>
+    <rect x="520" y="240" width="40" height="28" fill="#0e1a24" stroke="#7eb8a8" stroke-width="1.5"/>
+
+    <!-- status LEDs -->
+    <circle cx="110" cy="280" r="4" fill="#108474"/>
+    <circle cx="250" cy="280" r="4" fill="#108474"/>
+    <circle cx="390" cy="280" r="4" fill="#d4a04a"/>
+    <circle cx="530" cy="280" r="4" fill="#108474"/>
+  </g>
+
+  <!-- connector block accent -->
+  <rect x="300" y="108" width="40" height="60" rx="3" fill="#1a2a36" stroke="#5a8aa0" stroke-width="1.5"/>
+  <line x1="308" y1="120" x2="332" y2="120" stroke="#108474" stroke-width="2"/>
+  <line x1="308" y1="156" x2="332" y2="156" stroke="#ffd9c9" stroke-width="2"/>
+</svg>
